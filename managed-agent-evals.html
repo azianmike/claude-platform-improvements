@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluations · Claude Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-main: #1a1a1a;
+      --bg-sidebar: #111111;
+      --bg-sidebar-hover: #1e1e1e;
+      --bg-sidebar-active: #252525;
+      --bg-content: #1a1a1a;
+      --bg-card: #1a1a1a;
+      --bg-input: #242424;
+      --bg-row-hover: #1f1f1f;
+      --border-color: #2a2a2a;
+      --border-light: #333333;
+      --border-card: #2e2e2e;
+      --text-primary: #ececec;
+      --text-secondary: #8a8a8a;
+      --text-muted: #5a5a5a;
+      --text-sidebar: #a8a8a8;
+      --text-sidebar-active: #ececec;
+      --accent-orange: #d4793a;
+      --accent-purple: #8b7cdb;
+      --accent-blue: #5ba3e8;
+      --accent-green: #6ba968;
+      --accent-red: #d76b6b;
+      --new-badge-bg: #1e3a5c;
+      --new-badge-text: #5ba3e8;
+      --active-badge-bg: #173b1a;
+      --active-badge-text: #6ba968;
+      --regression-bg: #3a1818;
+      --regression-text: #e88a8a;
+      --improvement-bg: #173b1a;
+      --improvement-text: #6ba968;
+      --neutral-badge-bg: #232323;
+      --neutral-badge-text: #a8a8a8;
+      --warning-bg: #3a2a14;
+      --warning-text: #d4a067;
+      --sidebar-width: 232px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      padding: 16px 16px 14px;
+    }
+
+    .brand-name {
+      font-family: 'Source Serif 4', 'Inter', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.005em;
+    }
+
+    .brand-toggle {
+      margin-left: auto;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .brand-toggle:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-secondary);
+    }
+
+    .brand-toggle svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .workspace-selector {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 10px 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      background: transparent;
+      transition: background 0.1s;
+    }
+
+    .workspace-selector:hover {
+      background: var(--bg-sidebar-hover);
+    }
+
+    .workspace-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--accent-purple);
+    }
+
+    .workspace-label {
+      font-size: 13px;
+      color: var(--text-primary);
+      flex: 1;
+      font-weight: 400;
+    }
+
+    .workspace-chevron {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .nav-section {
+      padding: 2px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 13px;
+      font-weight: 400;
+      border-radius: 6px;
+      text-decoration: none;
+      position: relative;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-sidebar-active);
+    }
+
+    .nav-item.active {
+      color: var(--text-sidebar-active);
+      background: var(--bg-sidebar-active);
+      font-weight: 500;
+    }
+
+    .nav-item svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      opacity: 0.85;
+    }
+
+    .nav-item.active svg {
+      opacity: 1;
+    }
+
+    .nav-item .chevron {
+      margin-left: auto;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .nav-badge {
+      background: var(--new-badge-bg);
+      color: var(--new-badge-text);
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.03em;
+      margin-left: 6px;
+    }
+
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px 6px 34px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 12.5px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .nav-sub-item:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-sidebar-active);
+    }
+
+    .nav-sub-item.active {
+      background: var(--bg-sidebar-active);
+      color: var(--text-sidebar-active);
+      font-weight: 500;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 6px 8px 8px;
+    }
+
+    .credits-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      color: var(--text-sidebar);
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .credits-row:hover {
+      background: var(--bg-sidebar-hover);
+    }
+
+    .credits-row svg {
+      width: 15px;
+      height: 15px;
+      opacity: 0.85;
+    }
+
+    .credits-amount {
+      margin-left: auto;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-top: 4px;
+      transition: background 0.1s;
+    }
+
+    .user-row:hover {
+      background: var(--bg-sidebar-hover);
+    }
+
+    .user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #c89534, #8b6914);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-chevron {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* ─── MAIN ─── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg-content);
+    }
+
+    .main::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .main::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 4px;
+    }
+
+    .content-wrap {
+      width: 100%;
+      padding: 28px 40px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Page header */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .page-title {
+      font-family: 'Source Serif 4', 'Inter', serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 720px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border-card);
+      background: transparent;
+      color: var(--text-primary);
+      transition: background 0.1s, border-color 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--bg-sidebar-hover);
+      border-color: var(--border-light);
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-primary {
+      background: #f5f5f5;
+      color: #111;
+      border-color: #f5f5f5;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      border-color: #fff;
+    }
+
+    /* ─── FILTER ROW ─── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .search-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 340px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: 7px;
+      padding: 7px 12px;
+      transition: border-color 0.1s;
+    }
+
+    .search-input:focus-within {
+      border-color: var(--border-light);
+    }
+
+    .search-input svg {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .search-input input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-input input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: 7px;
+      padding: 7px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.1s;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--border-light);
+    }
+
+    .filter-chip-label {
+      color: var(--text-muted);
+    }
+
+    .filter-chip-chevron {
+      color: var(--text-muted);
+      font-size: 9px;
+      margin-left: 2px;
+    }
+
+    /* ─── TABLE ─── */
+    .table-wrap {
+      margin-top: 18px;
+    }
+
+    .eval-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .eval-table thead th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .eval-table thead th.checkbox-cell {
+      width: 36px;
+      padding-right: 0;
+    }
+
+    .eval-table tbody td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .eval-table tbody tr {
+      transition: background 0.08s;
+      cursor: pointer;
+    }
+
+    .eval-table tbody tr:hover {
+      background: var(--bg-row-hover);
+    }
+
+    .eval-table tbody td.checkbox-cell {
+      padding-right: 0;
+    }
+
+    .row-checkbox {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .row-checkbox:checked {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+    }
+
+    .row-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 0px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+
+    .suite-name {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .suite-id {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    .agent-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #232323;
+      border: 1px solid var(--border-card);
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .agent-chip svg {
+      width: 11px;
+      height: 11px;
+      color: var(--text-secondary);
+    }
+
+    .pass-rate-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .pass-bar {
+      width: 70px;
+      height: 4px;
+      background: #2a2a2a;
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .pass-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .pass-bar-fill.high {
+      background: var(--accent-green);
+    }
+
+    .pass-bar-fill.mid {
+      background: var(--accent-orange);
+    }
+
+    .pass-bar-fill.low {
+      background: var(--accent-red);
+    }
+
+    .pass-rate-val {
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      min-width: 38px;
+    }
+
+    .regression-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .regression-badge.has-regression {
+      color: var(--regression-text);
+      background: var(--regression-bg);
+    }
+
+    .regression-badge.no-regression {
+      color: var(--text-secondary);
+      background: var(--neutral-badge-bg);
+    }
+
+    .muted-val {
+      color: var(--text-secondary);
+      font-size: 12.5px;
+    }
+
+    .cost-val {
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      font-size: 12.5px;
+    }
+
+    .row-actions-cell {
+      width: 40px;
+      text-align: right;
+    }
+
+    .row-actions-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .row-actions-btn:hover {
+      background: var(--bg-sidebar-active);
+      color: var(--text-primary);
+    }
+
+    .row-actions-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ─── PAGINATION ─── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .page-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border-card);
+      background: transparent;
+      border-radius: 5px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+
+    .page-btn:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-light);
+    }
+
+    .page-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ─── EMPTY / TIP CARD (optional banner above) ─── */
+    .tip-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      background: #14232e;
+      border: 1px solid #1f3a4d;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tip-banner-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      color: var(--accent-blue);
+    }
+
+    .tip-banner-text {
+      font-size: 12.5px;
+      color: #b8d4e8;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .tip-banner-text strong {
+      color: #d0e4f0;
+      font-weight: 600;
+    }
+
+    .tip-banner-link {
+      color: #8cc3eb;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+    }
+
+    .tip-banner-link:hover {
+      color: #b0d8f5;
+    }
+
+    /* ─── CREATE EVAL SUITE MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: #1e1e1e;
+      border: 1px solid #2e2e2e;
+      border-radius: 14px;
+      width: 540px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+      transform: translateY(8px) scale(0.985);
+      transition: transform 0.18s ease, opacity 0.18s ease;
+      opacity: 0;
+      padding: 22px 22px 20px;
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.005em;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      transition: color 0.1s, background 0.1s;
+      flex-shrink: 0;
+      margin-top: -4px;
+      margin-right: -4px;
+    }
+
+    .modal-close:hover {
+      color: var(--text-primary);
+      background: #2a2a2a;
+    }
+
+    .modal-close svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .form-field {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .form-hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid #333;
+      border-radius: 7px;
+      padding: 9px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.1s;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: #555;
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2.5 4.5L6 8L9.5 4.5' stroke='%238a8a8a' stroke-width='1.3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: #2a2a2a;
+      margin: 4px -22px 16px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    /* Footer links */
+    .footer-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 28px 0 16px;
+      margin-top: auto;
+    }
+
+    .footer-link {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.1s;
+    }
+
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <span class="brand-name">Claude Console</span>
+      <button class="brand-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3" />
+          <line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="workspace-selector">
+      <svg class="workspace-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1.5L13.5 4.5V11.5L8 14.5L2.5 11.5V4.5L8 1.5Z" stroke="currentColor" stroke-width="1.3"
+          stroke-linejoin="round" fill="none" />
+        <path d="M8 1.5V8M8 8L13.5 4.5M8 8L2.5 4.5M8 8V14.5" stroke="currentColor" stroke-width="1.3"
+          stroke-linejoin="round" />
+      </svg>
+      <span class="workspace-label">Default</span>
+      <span class="workspace-chevron">▾</span>
+    </div>
+
+    <nav class="nav-section">
+      <a href="dashboard-demo.html" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L8 3L13 8V13a1 1 0 01-1 1H9.5V10h-3v4H4a1 1 0 01-1-1V8z" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+        </svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="10" r="3" stroke="currentColor" stroke-width="1.3" />
+          <path d="M8.2 8.5L13.5 3.2M11.5 5.2L13 6.7M10 6.7L11.5 8.2" stroke="currentColor" stroke-width="1.3"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        API keys
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.5 3L13 5.5L7 11.5L4 12L4.5 9L10.5 3Z" stroke="currentColor" stroke-width="1.3"
+            stroke-linejoin="round" />
+        </svg>
+        Build
+        <span class="chevron">▾</span>
+      </a>
+      <a href="#" class="nav-sub-item">Workbench</a>
+      <a href="#" class="nav-sub-item">Files</a>
+      <a href="#" class="nav-sub-item">Skills</a>
+      <a href="#" class="nav-sub-item">Batches</a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5" cy="5" r="2" stroke="currentColor" stroke-width="1.3" />
+          <circle cx="11" cy="11" r="2" stroke="currentColor" stroke-width="1.3" />
+          <path d="M6.5 6.5L9.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          <path d="M11 5L13 5M13 5L13 7M13 5L11 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Managed Agents
+        <span class="chevron">▾</span>
+      </a>
+      <a href="#" class="nav-sub-item">Quickstart</a>
+      <a href="#" class="nav-sub-item">Agents</a>
+      <a href="#" class="nav-sub-item">Sessions</a>
+      <a href="#" class="nav-sub-item active">
+        Evaluations
+        <span class="nav-badge">New</span>
+      </a>
+      <a href="#" class="nav-sub-item">
+        Deployments
+        <span class="nav-badge">New</span>
+      </a>
+      <a href="#" class="nav-sub-item">Environments</a>
+      <a href="#" class="nav-sub-item">Credential vaults</a>
+      <a href="#" class="nav-sub-item">Memory stores</a>
+
+      <a href="#" class="nav-item" style="margin-top: 4px;">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 2.5h7a2 2 0 012 2V13a0.5 0.5 0 01-0.5 0.5H4.5A1.5 1.5 0 013 12V2.5z" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M3 12a1.5 1.5 0 011.5-1.5H12" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+        Documentation
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="credits-row">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" />
+          <path d="M8 4.5V8L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Credits
+        <span class="credits-amount">$4.43</span>
+      </div>
+      <div class="user-row">
+        <div class="user-avatar">P</div>
+        <div class="user-info">
+          <span class="user-name">Potato</span>
+          <span class="user-meta">Admin · Potato's I…</span>
+        </div>
+        <span class="user-chevron">▾</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+  <main class="main">
+    <div class="content-wrap">
+
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Evaluations</h1>
+          <p class="page-subtitle">
+            Compare baseline vs. candidate agents across real scenarios to catch regressions before production.
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="openSuiteModal()">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3.5V12.5M3.5 8H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          Create eval suite
+        </button>
+      </div>
+
+      <!-- Tip banner -->
+      <div class="tip-banner">
+        <svg class="tip-banner-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.4" />
+          <path d="M10 6V10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+          <circle cx="10" cy="13.5" r="0.9" fill="currentColor" />
+        </svg>
+        <div class="tip-banner-text">
+          <strong>Tip:</strong>
+          Turn real sessions into eval scenarios from the
+          <a class="tip-banner-link" href="#">Sessions page</a> — open a session and choose
+          <em>Add to eval suite</em>.
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-row">
+        <div class="search-input">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3" />
+            <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+          <input type="text" placeholder="Search by suite name or ID" />
+        </div>
+        <div class="filter-chip">
+          <span class="filter-chip-label">Agent</span>
+          <span>All</span>
+          <span class="filter-chip-chevron">▾</span>
+        </div>
+        <div class="filter-chip">
+          <span class="filter-chip-label">Last run</span>
+          <span>All time</span>
+          <span class="filter-chip-chevron">▾</span>
+        </div>
+        <div class="filter-chip">
+          <span class="filter-chip-label">Status</span>
+          <span>All</span>
+          <span class="filter-chip-chevron">▾</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="eval-table">
+          <thead>
+            <tr>
+              <th class="checkbox-cell"><input type="checkbox" class="row-checkbox" aria-label="Select all" /></th>
+              <th>Suite</th>
+              <th>Agent</th>
+              <th>Scenarios</th>
+              <th>Last run</th>
+              <th>Pass rate</th>
+              <th>Regressions</th>
+              <th>Avg cost</th>
+              <th>Updated</th>
+              <th class="row-actions-cell"></th>
+            </tr>
+          </thead>
+          <tbody id="suites-tbody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button class="page-btn" aria-label="Previous page">
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 2.5L3.5 6L7.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="page-btn" aria-label="Next page">
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <a class="footer-link" href="#">API status</a>
+        <a class="footer-link" href="#">Help and support</a>
+        <a class="footer-link" href="#">Feedback</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══════════════════════ CREATE EVAL SUITE MODAL ═══════════════════════ -->
+  <div class="modal-overlay" id="suite-modal" onclick="if(event.target===this)closeSuiteModal()">
+    <div class="modal-box" role="dialog" aria-labelledby="suite-title">
+      <div class="modal-head">
+        <h2 class="modal-title" id="suite-title">Create eval suite</h2>
+        <button class="modal-close" onclick="closeSuiteModal()" aria-label="Close">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.5 3.5L12.5 12.5M12.5 3.5L3.5 12.5" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <p class="modal-sub">
+        Define a suite to compare a baseline agent against a candidate across the same set of scenarios.
+      </p>
+
+      <div class="form-field">
+        <label class="form-label" for="suite-name-input">Suite name</label>
+        <input id="suite-name-input" class="form-input" type="text" placeholder="e.g. Coding Agent Regression Suite" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="suite-agent-select">Agent</label>
+        <select id="suite-agent-select" class="form-select">
+          <option>Coding Assistant</option>
+          <option>Stock Market News Agent</option>
+        </select>
+        <div class="form-hint">Scenarios will be replayed against the agent's tool definitions and environment.</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label" for="baseline-select">Baseline</label>
+          <select id="baseline-select" class="form-select">
+            <option>agent_…fkGbPW · claude-opus-4-7</option>
+            <option>agent_…hvNkJZ · claude-opus-4-7</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="candidate-select">Candidate</label>
+          <select id="candidate-select" class="form-select">
+            <option>agent_…fkGbPW · claude-opus-4-8</option>
+            <option>Custom prompt revision</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Scenarios</label>
+        <div class="form-hint" style="margin-top:0; margin-bottom:8px;">
+          Start empty — add scenarios from real sessions or create them manually after the suite is created.
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="modal-footer">
+        <button class="btn" onclick="closeSuiteModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="closeSuiteModal()">Create suite</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── Suite data ───
+    const suites = [
+      {
+        name: 'Coding Agent Regression Suite',
+        id: 'eval_01…rT8nQz',
+        agent: 'Coding Assistant',
+        scenarios: 18,
+        lastRun: '2h ago',
+        passRate: 88,
+        regressions: 3,
+        avgCost: '$0.53',
+        updated: '2h ago',
+      },
+      {
+        name: 'Opus 4.8 upgrade check',
+        id: 'eval_01…h2VkLp',
+        agent: 'Coding Assistant',
+        scenarios: 24,
+        lastRun: '1d ago',
+        passRate: 92,
+        regressions: 1,
+        avgCost: '$0.61',
+        updated: '1d ago',
+      },
+      {
+        name: 'Tool-use schema validation',
+        id: 'eval_01…m9XzPq',
+        agent: 'Coding Assistant',
+        scenarios: 12,
+        lastRun: '3d ago',
+        passRate: 75,
+        regressions: 4,
+        avgCost: '$0.42',
+        updated: '3d ago',
+      },
+      {
+        name: 'Stock summarization quality',
+        id: 'eval_01…wK4FbT',
+        agent: 'Stock Market News Agent',
+        scenarios: 15,
+        lastRun: '5d ago',
+        passRate: 96,
+        regressions: 0,
+        avgCost: '$0.08',
+        updated: '5d ago',
+      },
+      {
+        name: 'Prompt v2 candidate',
+        id: 'eval_01…aN3jBs',
+        agent: 'Coding Assistant',
+        scenarios: 20,
+        lastRun: 'Never',
+        passRate: null,
+        regressions: null,
+        avgCost: '—',
+        updated: 'Jun 11',
+      },
+    ];
+
+    const agentIcon = `
+      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="4" r="1.5" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="8" cy="8" r="1.5" stroke="currentColor" stroke-width="1.1"/>
+        <path d="M5 5L7 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    const dotsIcon = `
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="3.5" r="1.1" fill="currentColor"/>
+        <circle cx="8" cy="8" r="1.1" fill="currentColor"/>
+        <circle cx="8" cy="12.5" r="1.1" fill="currentColor"/>
+      </svg>
+    `;
+
+    function passBarClass(rate) {
+      if (rate >= 85) return 'high';
+      if (rate >= 70) return 'mid';
+      return 'low';
+    }
+
+    function renderSuites() {
+      const tbody = document.getElementById('suites-tbody');
+      tbody.innerHTML = suites.map(s => {
+        const passCell = s.passRate === null
+          ? `<span class="muted-val">—</span>`
+          : `
+            <div class="pass-rate-cell">
+              <div class="pass-bar"><div class="pass-bar-fill ${passBarClass(s.passRate)}" style="width:${s.passRate}%"></div></div>
+              <span class="pass-rate-val">${s.passRate}%</span>
+            </div>
+          `;
+
+        const regressionCell = s.regressions === null
+          ? `<span class="muted-val">—</span>`
+          : s.regressions === 0
+            ? `<span class="regression-badge no-regression">None</span>`
+            : `<span class="regression-badge has-regression">${s.regressions}</span>`;
+
+        const lastRunCell = s.lastRun === 'Never'
+          ? `<span class="muted-val">Never</span>`
+          : `<span class="muted-val">${s.lastRun}</span>`;
+
+        return `
+          <tr>
+            <td class="checkbox-cell"><input type="checkbox" class="row-checkbox" aria-label="Select row" /></td>
+            <td>
+              <div class="suite-name">${s.name}</div>
+              <div class="suite-id">${s.id}</div>
+            </td>
+            <td><span class="agent-chip">${agentIcon}${s.agent}</span></td>
+            <td><span class="muted-val">${s.scenarios}</span></td>
+            <td>${lastRunCell}</td>
+            <td>${passCell}</td>
+            <td>${regressionCell}</td>
+            <td><span class="cost-val">${s.avgCost}</span></td>
+            <td><span class="muted-val">${s.updated}</span></td>
+            <td class="row-actions-cell"><button class="row-actions-btn" aria-label="Row actions">${dotsIcon}</button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    renderSuites();
+
+    // ─── Modal ───
+    const suiteModal = document.getElementById('suite-modal');
+
+    function openSuiteModal() {
+      suiteModal.classList.add('open');
+    }
+
+    function closeSuiteModal() {
+      suiteModal.classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && suiteModal.classList.contains('open')) {
+        closeSuiteModal();
+      }
+    });
+
+    // Row click doesn't navigate when clicking checkbox or row-actions
+    document.querySelectorAll('#suites-tbody tr').forEach(row => {
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.row-checkbox') || e.target.closest('.row-actions-btn')) return;
+        // would navigate to suite detail in real app
+      });
+    });
+  </script>
+</body>
+
+</html>
