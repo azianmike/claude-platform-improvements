@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rate limits · Claude Console</title>
+  <meta name="description" content="Peak-minute usage against each rate limit over the last 24 hours." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-main: #1a1a1a;
+      --bg-sidebar: #111111;
+      --bg-sidebar-hover: #1e1e1e;
+      --bg-sidebar-active: #252525;
+      --bg-content: #1a1a1a;
+      --bg-input: #242424;
+      --bg-row-hover: #202020;
+      --border-color: #2e2e2e;
+      --border-light: #333333;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888888;
+      --text-muted: #555555;
+      --text-sidebar: #aaaaaa;
+      --text-sidebar-active: #e8e8e8;
+      --accent-orange: #d4793a;
+      --accent-blue: #4a90d9;
+      --accent-red: #e05252;
+      --bar-bg: #2e2e2e;
+      --bar-default: #4a4a4a;
+      --bar-red: #c0392b;
+      --bar-blue-dot: #4a8cc4;
+      --new-badge-bg: #1e3a5c;
+      --new-badge-text: #5ba3e8;
+      --sidebar-width: 175px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    /* Logo / brand */
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--accent-orange);
+    }
+
+    .brand-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+    }
+
+    .brand-expand {
+      margin-left: auto;
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    /* Workspace selector */
+    .workspace-selector {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      color: var(--text-sidebar);
+    }
+
+    .workspace-selector:hover { background: var(--bg-sidebar-hover); }
+
+    .workspace-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .workspace-label {
+      font-size: 12px;
+      color: var(--text-sidebar);
+      flex: 1;
+    }
+
+    .workspace-chevron {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    /* Nav sections */
+    .nav-section {
+      padding: 6px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 6px 14px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 12.5px;
+      font-weight: 400;
+      border-radius: 0;
+      text-decoration: none;
+      position: relative;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-sidebar-active);
+    }
+
+    .nav-item.active {
+      color: var(--text-sidebar-active);
+      background: var(--bg-sidebar-active);
+    }
+
+    .nav-item svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .nav-item.active svg { opacity: 1; }
+
+    .nav-item .chevron {
+      margin-left: auto;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .nav-badge {
+      background: var(--new-badge-bg);
+      color: var(--new-badge-text);
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+
+    /* Sub-nav items (indented) */
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 14px 5px 28px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 12px;
+      text-decoration: none;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .nav-sub-item:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-sidebar-active);
+    }
+
+    .nav-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 4px 0;
+    }
+
+    /* Bottom user info */
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .credits-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 14px;
+      color: var(--text-sidebar);
+      font-size: 12px;
+    }
+
+    .credits-row svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0.6;
+    }
+
+    .credits-amount {
+      margin-left: auto;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .user-row:hover { background: var(--bg-sidebar-hover); }
+
+    .user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #b8860b, #8b6914);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-meta {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-chevron {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg-content);
+    }
+
+    .main::-webkit-scrollbar {
+      width: 6px;
+    }
+    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 3px;
+    }
+
+    /* Top header */
+    .content-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 24px 28px 0;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      border-radius: 4px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-secondary);
+    }
+
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Search bar */
+    .search-bar-wrap {
+      padding: 18px 28px 16px;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      padding: 6px 10px;
+      width: 220px;
+      transition: border-color 0.15s;
+    }
+
+    .search-bar:focus-within {
+      border-color: #4a4a4a;
+    }
+
+    .search-bar svg {
+      width: 13px;
+      height: 13px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .search-bar input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+    }
+
+    .search-bar input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ─── TABLE ─── */
+    .table-wrap {
+      padding: 0 28px 32px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 8px 0 8px;
+      white-space: nowrap;
+    }
+
+    thead th:last-child {
+      text-align: right;
+    }
+
+    .col-quota { width: 38%; }
+    .col-peak  { width: 44%; }
+    .col-used  { width: 14%; text-align: right; }
+    .col-icon  { width: 4%; text-align: right; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-row-hover);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 10px 0;
+      vertical-align: middle;
+    }
+
+    /* Quota name cell */
+    .quota-name {
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .quota-name .quota-detail {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Peak utilization cell */
+    .peak-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 16px;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 5px;
+      background: var(--bar-bg);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-fill.red {
+      background: var(--bar-red);
+    }
+
+    .progress-fill.default {
+      background: var(--bar-default);
+    }
+
+    .progress-fill.blue-dot {
+      background: var(--bar-blue-dot);
+      width: 2% !important;
+      position: relative;
+    }
+
+    .pct-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      min-width: 30px;
+      text-align: right;
+    }
+
+    /* info icon in header */
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      font-size: 8px;
+      font-weight: 600;
+      margin-left: 4px;
+      cursor: help;
+      vertical-align: middle;
+    }
+
+    /* Used / limit cell */
+    .used-cell {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    /* row icon */
+    .row-icon-cell {
+      text-align: right;
+      padding-left: 8px;
+    }
+
+    .row-icon-cell svg {
+      width: 13px;
+      height: 13px;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    /* Overuse highlight */
+    .pct-label.over { color: #c0392b; }
+
+    /* Peak header tooltip */
+    th .peak-header {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* ─── RATE LIMIT TIERS SECTION ─── */
+    .tier-section {
+      margin: 18px 28px 0;
+      border: 1px solid var(--border-light);
+      border-radius: 7px;
+      overflow: hidden;
+      background: #161616;
+    }
+
+    .tier-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px 18px 12px;
+      gap: 16px;
+    }
+
+    .tier-header-left {}
+
+    .tier-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .tier-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .tier-subtitle a {
+      color: #5ba3e8;
+      text-decoration: none;
+    }
+    .tier-subtitle a:hover { text-decoration: underline; }
+
+    .btn-upgrade {
+      flex-shrink: 0;
+      background: #2a2a2a;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      padding: 6px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-upgrade:hover {
+      background: #333;
+      border-color: #444;
+    }
+
+    /* Progress bar track with tier markers */
+    .tier-progress-wrap {
+      padding: 0 18px 0;
+    }
+
+    .tier-track {
+      position: relative;
+      height: 6px;
+      background: var(--bar-bg);
+      border-radius: 3px;
+      overflow: visible;
+    }
+
+    .tier-fill {
+      height: 100%;
+      width: 28%;
+      background: linear-gradient(90deg, #c0392b 0%, #e05252 100%);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    /* Tier separator ticks */
+    .tier-tick {
+      position: absolute;
+      top: -3px;
+      width: 1px;
+      height: 12px;
+      background: #1a1a1a;
+    }
+
+    /* Tier labels below the bar */
+    .tier-labels {
+      display: flex;
+      padding: 8px 0 16px;
+    }
+
+    .tier-label {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .tier-label-name {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .tier-label-name.active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .tier-label-price {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tier-label-price.active {
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    /* Contact banner */
+    .contact-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      gap: 12px;
+      background: #141414;
+    }
+
+    .contact-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .contact-banner-left svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+
+    .btn-contact {
+      flex-shrink: 0;
+      background: #222;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      padding: 5px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-contact:hover { background: #2a2a2a; }
+
+    /* Tier tabs */
+    .tier-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tier-tab {
+      padding: 9px 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.1s, border-color 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .tier-tab:hover { color: var(--text-primary); }
+
+    .tier-tab.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--text-primary);
+    }
+
+    .tier-current-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #2a2a2a;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      font-size: 9.5px;
+      color: var(--text-secondary);
+      padding: 1px 6px;
+      font-weight: 400;
+    }
+
+    /* Tier model table */
+    .tier-table-wrap {
+      padding: 0 18px 4px;
+    }
+
+    .tier-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tier-table thead th {
+      text-align: left;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 10px 0 9px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .tier-table thead th:not(:first-child) {
+      text-align: center;
+    }
+
+    .tier-table tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.1s;
+    }
+
+    .tier-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .tier-table tbody tr:hover {
+      background: var(--bg-row-hover);
+    }
+
+    .tier-table td {
+      padding: 11px 0;
+      vertical-align: middle;
+      font-size: 12.5px;
+      color: var(--text-primary);
+    }
+
+    .tier-table td:not(:first-child) {
+      text-align: center;
+    }
+
+    .tier-model-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+
+    .tier-model-name .ti-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1px solid var(--text-muted);
+      color: var(--text-muted);
+      font-size: 8px;
+      font-weight: 600;
+      cursor: help;
+      flex-shrink: 0;
+    }
+
+    .tier-token-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tier-token-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .tier-token-note {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar">
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <!-- Anthropic / Claude stylized icon -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.8 3L20 21h-3.5l-1.3-4H8.8L7.5 21H4L10.2 3h3.6zm-1.8 4.8L9.7 14h4.6L12 7.8z"/>
+      </svg>
+    </div>
+    <span class="brand-name">Claude Console</span>
+    <span class="brand-expand">▭</span>
+  </div>
+
+  <!-- Workspace -->
+  <div class="workspace-selector">
+    <svg class="workspace-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <span class="workspace-label">All workspaces</span>
+    <span class="workspace-chevron">▾</span>
+  </div>
+
+  <!-- Nav items -->
+  <nav class="nav-section">
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="5" height="5" rx="0.8" fill="currentColor"/>
+        <rect x="9" y="2" width="5" height="5" rx="0.8" fill="currentColor" opacity="0.5"/>
+        <rect x="2" y="9" width="5" height="5" rx="0.8" fill="currentColor" opacity="0.5"/>
+        <rect x="9" y="9" width="5" height="5" rx="0.8" fill="currentColor" opacity="0.5"/>
+      </svg>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      API keys
+    </a>
+
+    <div class="nav-divider"></div>
+
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 4h10M3 8h8M3 12h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Build
+      <span class="chevron">▾</span>
+    </a>
+    <a href="#" class="nav-sub-item">Workbench</a>
+    <a href="#" class="nav-sub-item">Files</a>
+    <a href="#" class="nav-sub-item">Skills</a>
+    <a href="#" class="nav-sub-item">Batches</a>
+
+    <div class="nav-divider"></div>
+
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Managed Agents
+      <span class="chevron">▾</span>
+    </a>
+    <a href="#" class="nav-sub-item">Quickstart</a>
+    <a href="#" class="nav-sub-item">Agents</a>
+    <a href="#" class="nav-sub-item">Sessions</a>
+    <a href="#" class="nav-sub-item">
+      Deployments
+      <span class="nav-badge">New</span>
+    </a>
+    <a href="#" class="nav-sub-item">Environments</a>
+    <a href="#" class="nav-sub-item">Credential vaults</a>
+    <a href="#" class="nav-sub-item">Memory stores</a>
+
+    <div class="nav-divider"></div>
+
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Documentation
+    </a>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="credits-row">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M8 5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="8" cy="11" r="0.6" fill="currentColor"/>
+      </svg>
+      Credits
+      <span class="credits-amount">$4.43</span>
+    </div>
+    <div class="user-row">
+      <div class="user-avatar">P</div>
+      <div class="user-info">
+        <span class="user-name">Potato</span>
+        <span class="user-meta">Admin · Potato's I…</span>
+      </div>
+      <span class="user-chevron">▾</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main class="main">
+
+  <!-- Header -->
+  <div class="content-header">
+    <div>
+      <h1 class="page-title">Rate limits</h1>
+      <p class="page-subtitle">Peak-minute usage against each rate limit over the last 24 hours. Model versions in a group share one quota.</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" title="View docs" aria-label="View documentation">
+        <!-- book / docs icon -->
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 2h8a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M5 5h4M5 7.5h4M5 10h2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <path d="M11 4h1a1 1 0 011 1v9a1 1 0 01-1 1H5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ RATE LIMIT TIERS SECTION ═══ -->
+  <div class="tier-section" id="tier-section">
+
+    <!-- Header row -->
+    <div class="tier-header">
+      <div class="tier-header-left">
+        <div class="tier-title">Rate limit tiers</div>
+        <div class="tier-subtitle">
+          Your usage tier determines your organization's API rate limits. Tiers unlock automatically as your total credit purchases reach each threshold.
+          <a href="#">Learn more</a>
+        </div>
+      </div>
+      <button class="btn-upgrade" id="btn-upgrade" onclick="openCreditsModal()">Upgrade tier</button>
+    </div>
+
+    <!-- Tier progress bar -->
+    <div class="tier-progress-wrap">
+      <div class="tier-track">
+        <div class="tier-fill"></div>
+        <!-- separator ticks at 20%, 40%, 60%, 80% -->
+        <div class="tier-tick" style="left:20%"></div>
+        <div class="tier-tick" style="left:40%"></div>
+        <div class="tier-tick" style="left:60%"></div>
+        <div class="tier-tick" style="left:80%"></div>
+      </div>
+      <div class="tier-labels">
+        <div class="tier-label">
+          <span class="tier-label-name">Free tier</span>
+          <span class="tier-label-price"></span>
+        </div>
+        <div class="tier-label">
+          <span class="tier-label-name active">Tier 1</span>
+          <span class="tier-label-price active">$5</span>
+        </div>
+        <div class="tier-label">
+          <span class="tier-label-name">Tier 2</span>
+          <span class="tier-label-price">$40</span>
+        </div>
+        <div class="tier-label">
+          <span class="tier-label-name">Tier 3</span>
+          <span class="tier-label-price">$200</span>
+        </div>
+        <div class="tier-label">
+          <span class="tier-label-name">Tier 4</span>
+          <span class="tier-label-price">$400</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact sales banner -->
+    <div class="contact-banner">
+      <div class="contact-banner-left">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 4a1 1 0 011-1h10a1 1 0 011 1v6a1 1 0 01-1 1H9l-3 2v-2H3a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+        Contact the Anthropic accounts team to learn more about custom rate limits.
+      </div>
+      <button class="btn-contact" onclick="alert('Contact sales clicked')">Contact sales</button>
+    </div>
+
+    <!-- Tier tabs -->
+    <div class="tier-tabs" id="tier-tabs">
+      <div class="tier-tab" data-tier="free" onclick="switchTier(this, 'free')">Free tier</div>
+      <div class="tier-tab active" data-tier="tier1" onclick="switchTier(this, 'tier1')">
+        Tier 1
+        <span class="tier-current-badge">current</span>
+      </div>
+      <div class="tier-tab" data-tier="tier2" onclick="switchTier(this, 'tier2')">Tier 2</div>
+      <div class="tier-tab" data-tier="tier3" onclick="switchTier(this, 'tier3')">Tier 3</div>
+      <div class="tier-tab" data-tier="tier4" onclick="switchTier(this, 'tier4')">Tier 4</div>
+    </div>
+
+    <!-- Tier model limits table -->
+    <div class="tier-table-wrap">
+      <table class="tier-table">
+        <thead>
+          <tr>
+            <th style="width:30%">Model</th>
+            <th style="width:23%">Requests per Minute</th>
+            <th style="width:27%">Input Tokens per Minute</th>
+            <th style="width:20%">Output Tokens per Minute</th>
+          </tr>
+        </thead>
+        <tbody id="tier-table-body">
+          <!-- rows rendered by JS -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <!-- END RATE LIMIT TIERS -->
+
+  <!-- Search bar -->
+  <div class="search-bar-wrap">
+    <div class="search-bar">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search quotas" id="quota-search" />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="quotas-table">
+      <thead>
+        <tr>
+          <th class="col-quota">Quota</th>
+          <th class="col-peak">
+            <div class="peak-header">
+              Peak utilization
+              <span class="info-icon" title="The highest per-minute usage over the last 24 hours">i</span>
+            </div>
+          </th>
+          <th class="col-used">Used / limit</th>
+          <th class="col-icon"></th>
+        </tr>
+      </thead>
+      <tbody id="quotas-body">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  // ─── RATE LIMIT TIER DATA ───
+  const tierData = {
+    free: [
+      { model: 'Claude Fable 5',    rpm: 5,    inputK: '25K',  inputNote: 'excluding cache reads', outputK: '5K' },
+      { model: 'Claude Opus Active', rpm: null, inputK: null,   inputNote: null,                    outputK: null, hasInfo: true },
+      { model: 'Claude Sonnet Active', rpm: 5,  inputK: '25K',  inputNote: 'excluding cache reads', outputK: '5K', hasInfo: true },
+      { model: 'Claude Haiku Active', rpm: 5,   inputK: '25K',  inputNote: 'excluding cache reads', outputK: '5K' },
+    ],
+    tier1: [
+      { model: 'Claude Fable 5',      rpm: 50,   inputK: '100K', inputNote: 'excluding cache reads', outputK: '20K' },
+      { model: 'Claude Opus Active',  rpm: '1K', inputK: '500K', inputNote: 'excluding cache reads', outputK: '80K', hasInfo: true },
+      { model: 'Claude Sonnet Active',rpm: '1K', inputK: '500K', inputNote: 'excluding cache reads', outputK: '80K', hasInfo: true },
+      { model: 'Claude Haiku Active', rpm: '1K', inputK: '500K', inputNote: 'excluding cache reads', outputK: '80K' },
+    ],
+    tier2: [
+      { model: 'Claude Fable 5',      rpm: 100,  inputK: '200K', inputNote: 'excluding cache reads', outputK: '40K' },
+      { model: 'Claude Opus Active',  rpm: '2K', inputK: '1M',   inputNote: 'excluding cache reads', outputK: '160K', hasInfo: true },
+      { model: 'Claude Sonnet Active',rpm: '2K', inputK: '1M',   inputNote: 'excluding cache reads', outputK: '160K', hasInfo: true },
+      { model: 'Claude Haiku Active', rpm: '2K', inputK: '1M',   inputNote: 'excluding cache reads', outputK: '160K' },
+    ],
+    tier3: [
+      { model: 'Claude Fable 5',      rpm: 200,  inputK: '400K', inputNote: 'excluding cache reads', outputK: '80K' },
+      { model: 'Claude Opus Active',  rpm: '4K', inputK: '2M',   inputNote: 'excluding cache reads', outputK: '320K', hasInfo: true },
+      { model: 'Claude Sonnet Active',rpm: '4K', inputK: '2M',   inputNote: 'excluding cache reads', outputK: '320K', hasInfo: true },
+      { model: 'Claude Haiku Active', rpm: '4K', inputK: '2M',   inputNote: 'excluding cache reads', outputK: '320K' },
+    ],
+    tier4: [
+      { model: 'Claude Fable 5',      rpm: 500,  inputK: '1M',   inputNote: 'excluding cache reads', outputK: '200K' },
+      { model: 'Claude Opus Active',  rpm: '8K', inputK: '4M',   inputNote: 'excluding cache reads', outputK: '640K', hasInfo: true },
+      { model: 'Claude Sonnet Active',rpm: '8K', inputK: '4M',   inputNote: 'excluding cache reads', outputK: '640K', hasInfo: true },
+      { model: 'Claude Haiku Active', rpm: '8K', inputK: '4M',   inputNote: 'excluding cache reads', outputK: '640K' },
+    ],
+  };
+
+  function renderTierTable(tierKey) {
+    const rows = tierData[tierKey];
+    const tbody = document.getElementById('tier-table-body');
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const infoIcon = r.hasInfo
+        ? `<span class="ti-icon" title="Includes all model versions in this group">i</span>`
+        : '';
+      const rpmCell = r.rpm === null ? '—' : r.rpm;
+      const inputCell = r.inputK === null
+        ? '—'
+        : `<div class="tier-token-cell"><span class="tier-token-val">${r.inputK}</span><span class="tier-token-note">${r.inputNote}</span></div>`;
+      const outputCell = r.outputK === null ? '—' : `<span class="tier-token-val">${r.outputK}</span>`;
+
+      tr.innerHTML = `
+        <td><div class="tier-model-name">${r.model} ${infoIcon}</div></td>
+        <td>${rpmCell}</td>
+        <td>${inputCell}</td>
+        <td>${outputCell}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function switchTier(el, tierKey) {
+    // Update tabs
+    document.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    // Re-render table
+    renderTierTable(tierKey);
+  }
+
+  // Initial tier table render
+  renderTierTable('tier1');
+
+  // ─── QUOTA TABLE DATA ───
+  const quotas = [
+    {
+      model: 'Claude Haiku Active',
+      detail: 'Requests',
+      pct: 131,
+      used: '1.3K',
+      limit: '1.0K',
+      barType: 'red',
+    },
+    {
+      model: 'Claude Haiku Active',
+      detail: 'Input tokens (excl. cache reads)',
+      pct: 2,
+      used: '11K',
+      limit: '500K',
+      barType: 'blue-dot',
+    },
+    {
+      model: 'Claude Haiku Active',
+      detail: 'Output tokens',
+      pct: 2,
+      used: '1.3K',
+      limit: '80K',
+      barType: 'blue-dot',
+    },
+    {
+      model: 'Claude Sonnet Active',
+      detail: 'Input tokens (excl. cache reads)',
+      pct: 0,
+      used: '0',
+      limit: '500K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Sonnet Active',
+      detail: 'Output tokens',
+      pct: 0,
+      used: '0',
+      limit: '80K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Sonnet Active',
+      detail: 'Requests',
+      pct: 0,
+      used: '0',
+      limit: '1.0K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Opus Active',
+      detail: 'Input tokens (excl. cache reads)',
+      pct: 0,
+      used: '0',
+      limit: '500K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Opus Active',
+      detail: 'Output tokens',
+      pct: 0,
+      used: '0',
+      limit: '80K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Opus Active',
+      detail: 'Requests',
+      pct: 0,
+      used: '0',
+      limit: '1.0K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Fable 5',
+      detail: 'Input tokens (excl. cache reads)',
+      pct: 0,
+      used: '0',
+      limit: '100K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Fable 5',
+      detail: 'Output tokens',
+      pct: 0,
+      used: '0',
+      limit: '20K',
+      barType: 'default',
+    },
+    {
+      model: 'Claude Fable 5',
+      detail: 'Requests',
+      pct: 0,
+      used: '0',
+      limit: '50',
+      barType: 'default',
+    },
+  ];
+
+  // Chart icon SVG (small bar chart)
+  const chartIconSVG = `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="9" width="3" height="5" rx="0.5" fill="currentColor" opacity="0.5"/>
+    <rect x="6.5" y="5" width="3" height="9" rx="0.5" fill="currentColor" opacity="0.5"/>
+    <rect x="11" y="7" width="3" height="7" rx="0.5" fill="currentColor" opacity="0.5"/>
+  </svg>`;
+
+  function renderRows(data) {
+    const tbody = document.getElementById('quotas-body');
+    tbody.innerHTML = '';
+
+    data.forEach(q => {
+      const tr = document.createElement('tr');
+
+      // Clamp bar width at 100% visually even if over
+      const barWidth = Math.min(q.pct, 100);
+      const isOver = q.pct > 100;
+
+      // bar fill class
+      let fillClass = 'default';
+      if (q.barType === 'red') fillClass = 'red';
+      else if (q.barType === 'blue-dot') fillClass = 'blue-dot';
+
+      const pctClass = isOver ? 'pct-label over' : 'pct-label';
+
+      tr.innerHTML = `
+        <td class="col-quota">
+          <span class="quota-name">
+            ${q.model}
+            <span class="quota-detail"> · ${q.detail}</span>
+          </span>
+        </td>
+        <td class="col-peak">
+          <div class="peak-cell">
+            <div class="progress-track">
+              <div class="progress-fill ${fillClass}" style="width: ${q.barType === 'blue-dot' ? 2 : barWidth}%"></div>
+            </div>
+            <span class="${pctClass}">${q.pct}%</span>
+          </div>
+        </td>
+        <td class="col-used">
+          <span class="used-cell">${q.used} / ${q.limit}</span>
+        </td>
+        <td class="col-icon row-icon-cell">
+          ${chartIconSVG}
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Initial render
+  renderRows(quotas);
+
+  // Search filter
+  document.getElementById('quota-search').addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    const filtered = quotas.filter(row =>
+      row.model.toLowerCase().includes(q) ||
+      row.detail.toLowerCase().includes(q)
+    );
+    renderRows(filtered);
+  });
+</script>
+
+<!-- ═══════════════════════ ADD CREDITS MODAL ═══════════════════════ -->
+<style>
+  /* Overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Dialog box */
+  .modal-box {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    opacity: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .modal-overlay.open .modal-box {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* Header */
+  .modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 20px 0;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e8e8e8;
+    margin-bottom: 6px;
+  }
+
+  .modal-subtitle {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+
+  .modal-subtitle a {
+    color: #5ba3e8;
+    text-decoration: none;
+  }
+  .modal-subtitle a:hover { text-decoration: underline; }
+
+  .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: color 0.1s, background 0.1s;
+    flex-shrink: 0;
+    margin-top: -2px;
+  }
+  .modal-close:hover { color: #aaa; background: #2a2a2a; }
+  .modal-close svg { width: 16px; height: 16px; }
+
+  /* Preset buttons */
+  .modal-presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 18px 20px 0;
+  }
+
+  .preset-btn {
+    padding: 9px 6px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #242424;
+    color: #bbb;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .preset-btn:hover { background: #2c2c2c; border-color: #444; color: #e8e8e8; }
+  .preset-btn.active {
+    background: #2e2e2e;
+    border-color: #e8e8e8;
+    color: #e8e8e8;
+  }
+
+  /* Amount input */
+  .modal-amount-label {
+    font-size: 11.5px;
+    color: #888;
+    padding: 14px 20px 6px;
+  }
+  .modal-amount-label span {
+    color: #555;
+  }
+
+  .modal-input-row {
+    display: flex;
+    align-items: center;
+    border: 1px solid #383838;
+    border-radius: 6px;
+    margin: 0 20px;
+    background: #161616;
+    transition: border-color 0.15s;
+    overflow: hidden;
+  }
+  .modal-input-row:focus-within { border-color: #555; }
+
+  .modal-currency {
+    padding: 0 10px 0 14px;
+    font-size: 13px;
+    color: #888;
+    user-select: none;
+    line-height: 40px;
+  }
+
+  .modal-amount-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #e8e8e8;
+    padding: 10px 14px 10px 0;
+    width: 100%;
+  }
+
+  /* Summary */
+  .modal-summary {
+    margin: 16px 20px 0;
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    font-size: 12.5px;
+    color: #888;
+    border-bottom: 1px solid #222;
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-row.total {
+    padding: 11px 14px;
+  }
+
+  .summary-row.total .summary-label {
+    font-size: 13px;
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  .summary-row.total .summary-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e8e8e8;
+  }
+
+  /* Payment method */
+  .modal-payment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 20px 0;
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    border-radius: 7px;
+    padding: 11px 14px;
+  }
+
+  .payment-label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .payment-right {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .stripe-icon {
+    width: 22px;
+    height: 22px;
+    background: #00a86b;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .stripe-icon svg { width: 14px; height: 14px; fill: #fff; }
+
+  .payment-method-name {
+    font-size: 12.5px;
+    color: #d0d0d0;
+    font-weight: 500;
+  }
+
+  .payment-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border-radius: 3px;
+    transition: color 0.1s;
+  }
+  .payment-edit:hover { color: #999; }
+  .payment-edit svg { width: 13px; height: 13px; }
+
+  /* Buy button */
+  .modal-buy-btn {
+    display: block;
+    width: calc(100% - 40px);
+    margin: 14px 20px 0;
+    padding: 12px;
+    background: #fff;
+    color: #111;
+    border: none;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.12s;
+  }
+  .modal-buy-btn:hover { background: #e8e8e8; }
+  .modal-buy-btn:active { background: #d4d4d4; }
+
+  /* Disclaimer */
+  .modal-disclaimer {
+    padding: 12px 20px 20px;
+    font-size: 10.5px;
+    color: #555;
+    line-height: 1.55;
+    text-align: left;
+  }
+  .modal-disclaimer a {
+    color: #5ba3e8;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="modal-overlay" id="credits-modal" onclick="handleOverlayClick(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+
+    <!-- Header -->
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title-text">Add credits</div>
+        <div class="modal-subtitle">
+          Your account is on Tier 1 and may use up to $500 credits/month.
+          This limit increases with usage. <a href="#">Learn more</a>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeCreditsModal()" aria-label="Close dialog">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Presets -->
+    <div class="modal-presets">
+      <button class="preset-btn" data-amount="5"  onclick="selectPreset(this, 5)">$5</button>
+      <button class="preset-btn" data-amount="20" onclick="selectPreset(this, 20)">$20</button>
+      <button class="preset-btn" data-amount="100" onclick="selectPreset(this, 100)">$100</button>
+      <button class="preset-btn active" data-amount="other" onclick="selectPreset(this, null)">Other</button>
+    </div>
+
+    <!-- Amount input -->
+    <div class="modal-amount-label">Enter amount <span>$5.00 minimum</span></div>
+    <div class="modal-input-row">
+      <span class="modal-currency">$</span>
+      <input
+        id="credit-amount-input"
+        class="modal-amount-input"
+        type="number"
+        min="5"
+        step="1"
+        value="35"
+        placeholder="35"
+        oninput="onAmountChange(this.value)"
+      />
+    </div>
+
+    <!-- Summary -->
+    <div class="modal-summary">
+      <div class="summary-row">
+        <span class="summary-label">Usage credits</span>
+        <span class="summary-val" id="summary-credits">$35.00</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Estimated tax</span>
+        <span class="summary-val" id="summary-tax">$3.69</span>
+      </div>
+      <div class="summary-row total">
+        <span class="summary-label">Total due</span>
+        <span class="summary-val" id="summary-total">$38.69</span>
+      </div>
+    </div>
+
+    <!-- Payment method -->
+    <div class="modal-payment">
+      <span class="payment-label">Payment method</span>
+      <div class="payment-right">
+        <div class="stripe-icon">
+          <!-- Stripe S icon -->
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.2 6.4c0-.9.8-1.3 2-.7l2.3 1.1.7-2.8C10.8 3.4 9.5 3 8 3 5.2 3 3 4.5 3 7c0 3.8 5 3.2 5 5 0 .7-.7 1.2-1.8 1.2-1.4 0-2.6-.6-3.3-1.3L2 14.7C3 15.5 4.8 16 6.5 16c2.9 0 5.5-1.4 5.5-4.1C12 8 7.2 8.7 7.2 6.4z" fill="white"/>
+          </svg>
+        </div>
+        <span class="payment-method-name">Link by Stripe</span>
+        <button class="payment-edit" title="Edit payment method" aria-label="Edit payment method">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Buy button -->
+    <button class="modal-buy-btn" id="buy-btn" onclick="handleBuy()">Buy $35 of credits</button>
+
+    <!-- Disclaimer -->
+    <div class="modal-disclaimer">
+      Credits are consumed with API, Claude Code, and Workbench usage, and expire 1
+      year after purchase. By clicking &ldquo;Buy credits&rdquo; you agree to
+      <a href="#">Anthropic's Credit Terms</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ─── MODAL LOGIC ───
+  const TAX_RATE = 0.1054; // ~10.54% effective rate to match screenshot ($3.69 on $35)
+
+  function openCreditsModal() {
+    document.getElementById('credits-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // Reset to "Other" preset with value 35
+    document.getElementById('credit-amount-input').value = 35;
+    selectPresetByAmount(null); // highlights "Other"
+    updateSummary(35);
+  }
+
+  function closeCreditsModal() {
+    document.getElementById('credits-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('credits-modal')) closeCreditsModal();
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeCreditsModal();
+  });
+
+  function selectPreset(el, amount) {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    if (amount !== null) {
+      document.getElementById('credit-amount-input').value = amount;
+      updateSummary(amount);
+    } else {
+      // "Other" — focus input
+      document.getElementById('credit-amount-input').focus();
+    }
+  }
+
+  function selectPresetByAmount(amount) {
+    document.querySelectorAll('.preset-btn').forEach(b => {
+      b.classList.remove('active');
+      const ba = parseFloat(b.dataset.amount);
+      if (amount !== null && ba === amount) b.classList.add('active');
+      else if (amount === null && b.dataset.amount === 'other') b.classList.add('active');
+    });
+  }
+
+  function onAmountChange(val) {
+    const amount = parseFloat(val) || 0;
+    // Deselect presets if value doesn't match one
+    const presetAmounts = [5, 20, 100];
+    if (presetAmounts.includes(amount)) {
+      selectPresetByAmount(amount);
+    } else {
+      selectPresetByAmount(null);
+    }
+    updateSummary(amount);
+  }
+
+  function updateSummary(amount) {
+    if (isNaN(amount) || amount < 0) amount = 0;
+    const tax = amount * TAX_RATE;
+    const total = amount + tax;
+    document.getElementById('summary-credits').textContent = '$' + amount.toFixed(2);
+    document.getElementById('summary-tax').textContent    = '$' + tax.toFixed(2);
+    document.getElementById('summary-total').textContent  = '$' + total.toFixed(2);
+    const label = amount >= 5 ? `Buy $${amount % 1 === 0 ? amount : amount.toFixed(2)} of credits` : 'Buy credits';
+    document.getElementById('buy-btn').textContent = label;
+  }
+
+  function handleBuy() {
+    const amount = parseFloat(document.getElementById('credit-amount-input').value);
+    if (isNaN(amount) || amount < 5) {
+      document.getElementById('credit-amount-input').style.outline = '1.5px solid #c0392b';
+      setTimeout(() => { document.getElementById('credit-amount-input').style.outline = ''; }, 1500);
+      return;
+    }
+    alert(`Purchasing $${amount.toFixed(2)} of credits via Link by Stripe.`);
+    closeCreditsModal();
+  }
+</script>
+</body>
+</html>
