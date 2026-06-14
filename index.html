@@ -713,13 +713,15 @@
       </div>
 
       <h2 class="doc-h2">Prioritization</h2>
-      <p>With unlimited resources, we should of course do all of these solutions. However, with limited resources, we
-        must prioritize. I'll propose prioritizing based 3 principles:</p>
+      <p>With unlimited resources, we should of course do all of these solutions. However, with limited resources, we must prioritize. I'll propose prioritizing based 3 principles:</p>
       <ul>
-        <li>Estimated impact to our north star metric (revenue)</li>
-        <li>Estimated effort to launch an MVP</li>
-        <li>Differentiates our core product</li>
+        <li><strong>Estimated impact to our north star metric:</strong> how directly does this increase Claude API revenue?</li>
+        <li><strong>Estimated effort to launch an MVP:</strong> how quickly can we ship, learn, and iterate?</li>
+        <li><strong>Strategic differentiation:</strong> does this make Claude Platform meaningfully better for the developers we want to win?</li>
       </ul>
+      <p>Based on those principles, I would prioritize <strong>Problem #1: rate-limit upgrade guidance</strong> first. It is the least differentiated idea, but it has the clearest near-term revenue path and the lowest engineering effort. Customers hitting 429s are already high-intent users trying to send more traffic to Claude, so helping them understand the limit, recover quickly, and upgrade when eligible should convert an existing scaling pain into incremental usage and revenue.</p>
+      <p>After that, I would prioritize <strong>Problem #2: agent spend guardrails</strong> because it best supports our broader strategy of making Claude safe and reliable for production workloads. It is more differentiated than the rate-limit fix and creates the foundation for the bigger agent platform bet.</p>
+      <p>I would sequence <strong>Problem #3: Agent Eval Workbench</strong> after validating demand through #2. It likely has the largest long-term strategic upside, but it also has the highest execution risk, so I'd want stronger customer signal (through talking to customers) before fully committing.</p>
 
     </div>
   </div>
