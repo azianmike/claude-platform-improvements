@@ -537,19 +537,21 @@
     <div class="tldr-block">
       <div class="tldr-label">TL;DR</div>
       <p>To grow Claude API revenue, I'd focus the Platform on our hero user: software developers at fast-growing,
-        AI-native startups (Series A–D) — they decide which models to build on, scale spend fastest, and their usage
-        compounds. My intuition tells me new user acquisition is driven by model and product capabilities, so the
-        Platform's lever isn't top-of-funnel demand; it's making "scale your AI workloads on Claude" the safe, reliable,
-        and obvious choice. Our north star is API revenue, and the team is accountable for weekly revenue per active org
-        (plus net revenue retention).</p>
-      <p>Three bets, escalating in scope:</p>
+        AI-native startups (Series A–D). These devs decide which models to build on, scale spend fastest, and their
+        usage compounds. My intuition tells me new user acquisition is driven by model and product capabilities, so the
+        Platform's lever isn't top-of-funnel demand; it's helping devs "scale your AI workloads on Claude". Our north
+        star is API revenue, and the team is accountable for weekly revenue per active org
+        (in addition to other metrics).</p>
+      <p>The three bets we'll prioritize:</p>
       <ul>
-        <li><strong>Small (2–3 days)</strong> — Problem: rate-limit friction. Solution: when scaling teams hit 429s,
+        <li><strong>Small (2–3 days)</strong> — Problem: rate-limits stall growth. Solution: when scaling teams hit
+          429s,
           give guidance to upgrade their tier via buying more credits.</li>
-        <li><strong>Medium (2 weeks)</strong> — Problem: unpredictable agent costs. Solution: per-agent spend monitoring
+        <li><strong>Medium (2 weeks)</strong> — Problem: unpredictable agent costs. Solution:Agent spend/usage
+          monitoring
           and anomaly alerts.</li>
         <li><strong>Big bet (1–2 months)</strong> — Problem: no way to know if an agent change regressed performance.
-          Solution: an Agent Eval Workbench on Managed Agents that compares baseline vs. candidate across production
+          Solution: an Agent Eval Workbench on Managed Agents that compares performance across production
           scenarios.</li>
       </ul>
       <p>I'd ship the small bet first (clearest near-term revenue, lowest effort), then the medium, then the big bet
@@ -573,7 +575,7 @@
       <h2 class="doc-h2">Who uses Claude Platform today?</h2>
       <p>The users who use our platform today can be separated into three buckets:</p>
       <ol>
-        <li>Non-technical consumers/hobbyist discovering Claude capabilities, building a small tool, or using a 3rd
+        <li>Consumers/hobbyists discovering Claude capabilities, building a small tool, or using a 3rd
           party tool (e.g. OpenClaw)</li>
         <li>Software developers at businesses who are building, monitoring, and improving their AI use cases</li>
         <li>Finance (or admin) leaders who are monitoring costs, paying invoices, and managing teammate access</li>
@@ -588,8 +590,9 @@
       <p>Based on these principles, I believe our core focus should be on software developers (#2). This is our "hero"
         set of users who are deciding what models/APIs to build with day in and day out. The more we build for them and
         solve their problems, the more likely it is a business decides to adopt, retain, and grow with Anthropic. While
-        consumers/hobbyists are important, they generally do not control large spend. Additionally, finance leaders do
-        control large spend but are less likely to make technical decisions on a model or API to use.</p>
+        consumers/hobbyists are important, they generally do not control large spend. Additionally, while finance
+        leaders do
+        control large spend, they are less likely to make technical decisions on a model or API to use.</p>
       <p>Specifically I'd focus on software developers at fast growing AI native startups, often series A to series D.
         While enterprises likely drive the largest absolute API spend, AI startups today are compounding growth faster,
         which I believe leads to more token and API revenue usage long term than today's enterprises. They're likely AI
@@ -598,14 +601,14 @@
       <p>These software developers are savvy and intelligent, they have likely already done research on the top AI
         models and have either chosen Anthropic's models or are currently evaluating and comparing to competitor's
         models.</p>
-      <p>They're much less likely to be convinced by marketing and sales speak and much more convinced by data,
+      <p>They're much less likely to be convinced by marketing and sales speak and more likely convinced by data,
         analysis, and product capabilities.</p>
 
       <h2 class="doc-h2">Strategy</h2>
-      <p>How we win: Acquisition is model and product-led — these developers come to us because our models win on their
-        evals or our APIs fit their needs better, not because of Platform features — so top-of-funnel demand generation
+      <p>How we win: Acquisition is model and product-led — these developers come to us because our models perform
+        better or our APIs fit their needs better, not because of Platform features — so top-of-funnel demand generation
         isn't our lever. The Platform's job is to make "scale your AI workloads on Claude" the safe, obvious, and
-        reliable choice.</p>
+        reliable choice (compared to scaling your workload on other platforms).</p>
       <p>Our north star is API revenue, but revenue is lagging and influenced by factors outside Platform's control
         (model launches, pricing, etc). The primary metric our team will be accountable for is <strong>weekly revenue
           per active org</strong> (active org = org with paid API usage in the last 7 days). This directly captures our
@@ -616,7 +619,7 @@
         fraud/abuse. With that framing, the metrics we'll track:</p>
       <ul>
         <li><strong>North star</strong>: weekly API revenue</li>
-        <li><strong>Team primary metric:</strong> weekly revenue per active org, net revenue retention (quarterly)</li>
+        <li><strong>Team primary metric:</strong> weekly revenue per active org</li>
         <li><strong>Secondary</strong>:
           <ul>
             <li><strong>Acquisition / conversion:</strong> new orgs created, teammates invited</li>
@@ -651,7 +654,7 @@
         alt="@thdxr on X: the max public rate limit on claude is 400K input tokens per minute — i don't really understand how people are building products on this"
         class="tweet-img" />
       <ul>
-        <li>Solution (small, 2-3 eng days): In both the Platform Console and Docs, when an org hits 429s on a model,
+        <li>Solution (small, 2-3 eng days): When an org hits 429s on a model,
           show a message like: "You're rate-limited on Sonnet. You can unlock higher rate limits by adding credits to
           upgrade your tier." Then add an easy to click button to purchase more credits to upgrade tier.</li>
         <li>Hypothesis: Helping fast scaling startups upgrade for more rate limits both unblocks these startups to
@@ -702,11 +705,12 @@
         </li>
       </ul>
       <img src="screenshot-agent-costs.png"
-        alt="@jerryjliu0 on X: concerned about running Fable at API-based billing — token spend at headcount-level costs"
+        alt="@Hartdrawss on X: This reddit user lost $6,000 in credits because of Claude in under 8 hours — a single loop ran 46 times unattended, the dashboard lagged by days"
         class="tweet-img" />
       <ul>
-        <li>Solution (medium, 2 weeks eng): Receive email alerts when a run exceeds expected spend or token usage at a
-          per agent level.
+        <li>Solution (medium, 2 weeks eng): Add agent anomaly detection for when Managed Agents go over
+          budget/tokens/session
+          time. Also receive email alerts.
           <ul>
             <li><em>Assumption: We have all the data to track token usage, duration, and account cost structure.</em>
             </li>
