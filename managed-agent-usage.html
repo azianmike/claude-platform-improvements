@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Managed Agent Usage &middot; Claude Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-main: #1a1a1a;
+      --bg-sidebar: #111111;
+      --bg-sidebar-hover: #1e1e1e;
+      --bg-sidebar-active: #252525;
+      --bg-content: #1a1a1a;
+      --bg-input: #242424;
+      --bg-row-hover: #1f1f1f;
+      --border-color: #2a2a2a;
+      --border-light: #333333;
+      --border-card: #2e2e2e;
+      --text-primary: #ececec;
+      --text-secondary: #8a8a8a;
+      --text-muted: #5a5a5a;
+      --text-sidebar: #a8a8a8;
+      --text-sidebar-active: #ececec;
+      --accent-orange: #d4793a;
+      --accent-purple: #8b7cdb;
+      --accent-blue: #5ba3e8;
+      --accent-green: #6ba968;
+      --accent-red: #d76b6b;
+      --new-badge-bg: #1e3a5c;
+      --new-badge-text: #5ba3e8;
+      --active-badge-bg: #173b1a;
+      --active-badge-text: #6ba968;
+      --idle-badge-bg: #232323;
+      --idle-badge-text: #a8a8a8;
+      --alert-bg: #3a1818;
+      --alert-text: #e88a8a;
+      --warn-bg: #3a2a18;
+      --warn-text: #e1a35f;
+      --neutral-badge-bg: #232323;
+      --neutral-badge-text: #a8a8a8;
+      --sidebar-width: 232px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-brand { display: flex; align-items: center; padding: 16px 16px 14px; }
+    .brand-name {
+      font-family: 'Source Serif 4', 'Inter', serif;
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.005em;
+    }
+    .brand-toggle {
+      margin-left: auto;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .brand-toggle:hover { background: var(--bg-sidebar-hover); color: var(--text-secondary); }
+    .brand-toggle svg { width: 16px; height: 16px; }
+
+    .workspace-selector {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 10px 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      background: transparent;
+      transition: background 0.1s;
+    }
+    .workspace-selector:hover { background: var(--bg-sidebar-hover); }
+    .workspace-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--accent-purple); }
+    .workspace-label { font-size: 13px; color: var(--text-primary); flex: 1; font-weight: 400; }
+    .workspace-chevron { font-size: 10px; color: var(--text-muted); }
+
+    .nav-section { padding: 2px 8px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 13px;
+      font-weight: 400;
+      border-radius: 6px;
+      text-decoration: none;
+      position: relative;
+      transition: background 0.1s, color 0.1s;
+    }
+    .nav-item:hover { background: var(--bg-sidebar-hover); color: var(--text-sidebar-active); }
+    .nav-item.active { color: var(--text-sidebar-active); background: var(--bg-sidebar-active); font-weight: 500; }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.85; }
+    .nav-item.active svg { opacity: 1; }
+    .nav-item .chevron { margin-left: auto; font-size: 9px; color: var(--text-muted); }
+
+    .nav-badge {
+      background: var(--new-badge-bg);
+      color: var(--new-badge-text);
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.03em;
+      margin-left: 6px;
+    }
+
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px 6px 34px;
+      cursor: pointer;
+      color: var(--text-sidebar);
+      font-size: 12.5px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .nav-sub-item:hover { background: var(--bg-sidebar-hover); color: var(--text-sidebar-active); }
+    .nav-sub-item.active { background: var(--bg-sidebar-active); color: var(--text-sidebar-active); font-weight: 500; }
+
+    .sidebar-footer { margin-top: auto; padding: 6px 8px 8px; }
+    .credits-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      color: var(--text-sidebar);
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .credits-row:hover { background: var(--bg-sidebar-hover); }
+    .credits-row svg { width: 15px; height: 15px; opacity: 0.85; }
+    .credits-amount { margin-left: auto; color: var(--text-secondary); font-size: 12.5px; }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-top: 4px;
+      transition: background 0.1s;
+    }
+    .user-row:hover { background: var(--bg-sidebar-hover); }
+    .user-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #c89534, #8b6914);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .user-info { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .user-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-chevron { font-size: 10px; color: var(--text-muted); }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg-content);
+    }
+    .main::-webkit-scrollbar { width: 8px; }
+    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    .content-wrap {
+      width: 100%;
+      padding: 28px 40px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .page-title {
+      font-family: 'Source Serif 4', 'Inter', serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 720px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border-card);
+      background: transparent;
+      color: var(--text-primary);
+      transition: background 0.1s, border-color 0.1s, color 0.1s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--bg-sidebar-hover); border-color: var(--border-light); }
+    .btn svg { width: 14px; height: 14px; }
+    .btn-primary { background: #f5f5f5; color: #111; border-color: #f5f5f5; }
+    .btn-primary:hover { background: #fff; border-color: #fff; }
+    .btn-secondary { color: var(--text-primary); background: var(--bg-input); }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      max-width: 340px;
+      min-width: 220px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: 7px;
+      padding: 7px 12px;
+      transition: border-color 0.1s;
+    }
+    .search-input:focus-within { border-color: var(--border-light); }
+    .search-input svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+    .search-input input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      min-width: 0;
+    }
+    .search-input input::placeholder { color: var(--text-muted); }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: 7px;
+      padding: 7px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.1s, background 0.1s;
+      white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: var(--border-light); }
+    .filter-chip.active {
+      background: var(--bg-sidebar-active);
+      border-color: var(--border-light);
+    }
+    .filter-chip-label { color: var(--text-muted); }
+    .filter-chip-chevron { color: var(--text-muted); font-size: 9px; margin-left: 2px; }
+
+    .view-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      margin-bottom: 2px;
+    }
+    .view-tab {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+    .view-tab:hover { background: var(--bg-sidebar-hover); color: var(--text-primary); }
+    .view-tab.active {
+      background: var(--bg-sidebar-active);
+      border-color: var(--border-card);
+      color: var(--text-primary);
+    }
+
+    .usage-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    .usage-table-wrap::-webkit-scrollbar { height: 8px; }
+    .usage-table-wrap::-webkit-scrollbar-track { background: transparent; }
+    .usage-table-wrap::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 980px;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      transition: background 0.08s;
+      cursor: pointer;
+    }
+    tbody tr:hover { background: var(--bg-row-hover); }
+
+    .mono {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 210px;
+    }
+    .name-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      border: 1px solid var(--border-card);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #202020;
+      flex-shrink: 0;
+    }
+    .name-icon svg { width: 13px; height: 13px; }
+    .name-stack { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .name-primary { color: var(--text-primary); font-size: 13px; }
+    .name-secondary { color: var(--text-muted); font-size: 11.5px; }
+
+    .model-chip,
+    .agent-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-primary);
+      background: #1c1c1c;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .model-chip {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+    }
+    .agent-chip { font-size: 12px; border-radius: 6px; background: #232323; padding: 3px 9px; }
+    .agent-chip svg { width: 11px; height: 11px; color: var(--text-secondary); }
+
+    .status-badge,
+    .anomaly-badge,
+    .email-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .status-badge.active { color: var(--active-badge-text); background: var(--active-badge-bg); }
+    .status-badge.completed { color: var(--idle-badge-text); background: var(--idle-badge-bg); }
+    .status-badge.running { color: var(--accent-blue); background: #14263a; }
+    .status-badge.failed { color: var(--alert-text); background: var(--alert-bg); }
+    .anomaly-badge.alert { color: var(--alert-text); background: var(--alert-bg); }
+    .anomaly-badge.warn { color: var(--warn-text); background: var(--warn-bg); }
+    .anomaly-badge.none { color: var(--neutral-badge-text); background: var(--neutral-badge-bg); }
+    .email-badge.sent { color: var(--accent-blue); background: #14263a; }
+    .email-badge.cooldown { color: var(--warn-text); background: var(--warn-bg); }
+    .email-badge.none { color: var(--neutral-badge-text); background: var(--neutral-badge-bg); }
+
+    .metric {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+    }
+    .metric.high { color: #ef9c9c; }
+    .metric.warn { color: #e1a35f; }
+    .muted-val {
+      color: var(--text-secondary);
+      font-size: 12.5px;
+    }
+
+    .row-actions-cell { width: 42px; text-align: right; }
+    .dots-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+      vertical-align: middle;
+    }
+    .dots-btn:hover { background: var(--bg-sidebar-active); color: var(--text-primary); }
+    .dots-btn svg { width: 16px; height: 16px; }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .page-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border-card);
+      background: transparent;
+      border-radius: 5px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+    .page-btn:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-light);
+    }
+    .page-btn svg { width: 12px; height: 12px; }
+
+    .detail-shell {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .trace-panel,
+    .email-panel {
+      border: 1px solid var(--border-card);
+      background: #1c1c1c;
+      border-radius: 8px;
+    }
+
+    .trace-head {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .trace-title { font-size: 17px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+    .trace-meta { display: flex; flex-wrap: wrap; gap: 9px; color: var(--text-secondary); font-size: 12.5px; }
+    .trace-meta span { display: inline-flex; align-items: center; gap: 6px; }
+
+    .anomaly-banner {
+      margin: 16px 18px 0;
+      border: 1px solid rgba(215, 107, 107, 0.38);
+      background: rgba(58, 24, 24, 0.62);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: none;
+    }
+    .anomaly-banner.visible { display: block; }
+    .banner-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f0b0b0;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .banner-title svg { width: 14px; height: 14px; }
+    .banner-copy { color: var(--text-primary); line-height: 1.5; max-width: 900px; }
+    .banner-reason { color: #e8a0a0; margin-top: 5px; font-size: 12.5px; line-height: 1.45; }
+
+    .trace-body { padding: 16px 18px 18px; }
+    .trace-steps { display: flex; flex-direction: column; gap: 10px; }
+    .trace-step {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 96px;
+      gap: 14px;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .trace-step:last-child { border-bottom: none; }
+    .step-time { color: var(--text-muted); font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; }
+    .step-main { min-width: 0; }
+    .step-title { color: var(--text-primary); font-size: 13px; margin-bottom: 3px; }
+    .step-sub { color: var(--text-secondary); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .step-cost { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+    .email-panel { padding: 16px; }
+    .side-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .email-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12.5px;
+    }
+    .email-line:last-child { border-bottom: none; }
+    .email-label { color: var(--text-muted); flex-shrink: 0; }
+    .email-value {
+      color: var(--text-primary);
+      text-align: right;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .email-link {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    .email-link:hover { text-decoration: underline; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.68);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.16s ease;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .detector-modal {
+      width: 560px;
+      max-width: 100%;
+      background: #1e1e1e;
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.66);
+      transform: translateY(8px) scale(0.985);
+      opacity: 0;
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+    .modal-overlay.open .detector-modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+    .modal-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 430px;
+    }
+    .modal-close {
+      border: none;
+      background: none;
+      color: var(--text-secondary);
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--bg-sidebar-active); color: var(--text-primary); }
+    .modal-close svg { width: 16px; height: 16px; }
+
+    .detector-form { padding: 6px 22px 18px; }
+    .detector-row {
+      display: grid;
+      grid-template-columns: 1fr 158px;
+      gap: 18px;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .detector-row:last-of-type { border-bottom: none; }
+    .detector-copy {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+    .detector-text { min-width: 0; }
+    .detector-label {
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .detector-hint {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .switch {
+      position: relative;
+      width: 34px;
+      height: 20px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      background: #303030;
+      border: 1px solid var(--border-light);
+      border-radius: 999px;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .switch-track::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 2px;
+      top: 2px;
+      background: var(--text-secondary);
+      border-radius: 50%;
+      transition: transform 0.12s, background 0.12s;
+    }
+    .switch input:checked + .switch-track {
+      background: #253f2a;
+      border-color: #3c6a42;
+    }
+    .switch input:checked + .switch-track::after {
+      transform: translateX(14px);
+      background: var(--accent-green);
+    }
+
+    .threshold-input {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) 54px;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border-card);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .threshold-prefix,
+    .threshold-suffix {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .threshold-suffix {
+      text-align: left;
+      padding-right: 10px;
+    }
+    .threshold-input input {
+      min-width: 0;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+      padding: 9px 4px;
+      font-variant-numeric: tabular-nums;
+    }
+    .threshold-input input:disabled {
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    .email-alert-summary {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: right;
+    }
+    .detector-note {
+      margin-top: 2px;
+      border: 1px solid var(--border-card);
+      background: #202020;
+      border-radius: 7px;
+      padding: 11px 12px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .detector-note strong { color: var(--text-primary); font-weight: 500; }
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 22px 20px;
+      border-top: 1px solid var(--border-color);
+    }
+    .preview-count {
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+    .preview-count strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 28px 0 16px;
+      margin-top: auto;
+    }
+    .footer-link {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.1s;
+    }
+    .footer-link:hover { color: var(--text-primary); }
+
+    @media (max-width: 920px) {
+      body { overflow: auto; height: auto; min-height: 100vh; }
+      .sidebar { display: none; }
+      .main { min-height: 100vh; overflow: visible; }
+      .content-wrap { padding: 24px 18px; }
+      .page-header { flex-direction: column; gap: 14px; margin-bottom: 18px; }
+      .header-actions { justify-content: flex-start; }
+      .detail-shell { grid-template-columns: 1fr; }
+      .detector-row { grid-template-columns: 1fr; gap: 9px; }
+      .modal-footer { flex-direction: column; align-items: stretch; }
+      .modal-actions { justify-content: flex-end; }
+      .trace-step { grid-template-columns: 72px minmax(0, 1fr); }
+      .step-cost { display: none; }
+      table { min-width: 820px; }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-name">Claude Console</span>
+      <button class="brand-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3" />
+          <line x1="6" y1="2.5" x2="6" y2="13.5" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="workspace-selector">
+      <svg class="workspace-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1.5L13.5 4.5V11.5L8 14.5L2.5 11.5V4.5L8 1.5Z" stroke="currentColor" stroke-width="1.3"
+          stroke-linejoin="round" fill="none" />
+        <path d="M8 1.5V8M8 8L13.5 4.5M8 8L2.5 4.5M8 8V14.5" stroke="currentColor" stroke-width="1.3"
+          stroke-linejoin="round" />
+      </svg>
+      <span class="workspace-label">Default</span>
+      <span class="workspace-chevron">&#9662;</span>
+    </div>
+
+    <nav class="nav-section">
+      <a href="dashboard-demo.html" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L8 3L13 8V13a1 1 0 01-1 1H9.5V10h-3v4H4a1 1 0 01-1-1V8z" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+        </svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="10" r="3" stroke="currentColor" stroke-width="1.3" />
+          <path d="M8.2 8.5L13.5 3.2M11.5 5.2L13 6.7M10 6.7L11.5 8.2" stroke="currentColor" stroke-width="1.3"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        API keys
+      </a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10.5 3L13 5.5L7 11.5L4 12L4.5 9L10.5 3Z" stroke="currentColor" stroke-width="1.3"
+            stroke-linejoin="round" />
+        </svg>
+        Build
+        <span class="chevron">&#9662;</span>
+      </a>
+      <a href="#" class="nav-sub-item">Workbench</a>
+      <a href="#" class="nav-sub-item">Files</a>
+      <a href="#" class="nav-sub-item">Skills</a>
+      <a href="#" class="nav-sub-item">Batches</a>
+
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="5" cy="5" r="2" stroke="currentColor" stroke-width="1.3" />
+          <circle cx="11" cy="11" r="2" stroke="currentColor" stroke-width="1.3" />
+          <path d="M6.5 6.5L9.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          <path d="M11 5L13 5M13 5L13 7M13 5L11 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Managed Agents
+        <span class="chevron">&#9662;</span>
+      </a>
+      <a href="#" class="nav-sub-item">Quickstart</a>
+      <a href="#agents" class="nav-sub-item active" data-view-link="agents">Agents</a>
+      <a href="#sessions" class="nav-sub-item" data-view-link="sessions">Sessions</a>
+      <a href="managed-agent-evals.html" class="nav-sub-item">
+        Evaluations
+        <span class="nav-badge">New</span>
+      </a>
+      <a href="#" class="nav-sub-item">
+        Deployments
+        <span class="nav-badge">New</span>
+      </a>
+      <a href="#" class="nav-sub-item">Environments</a>
+      <a href="#" class="nav-sub-item">Credential vaults</a>
+      <a href="#" class="nav-sub-item">Memory stores</a>
+
+      <a href="#" class="nav-item" style="margin-top: 4px;">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 2.5h7a2 2 0 012 2V13a0.5 0.5 0 01-0.5 0.5H4.5A1.5 1.5 0 013 12V2.5z" stroke="currentColor"
+            stroke-width="1.3" stroke-linejoin="round" />
+          <path d="M3 12a1.5 1.5 0 011.5-1.5H12" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+        Documentation
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="credits-row">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" />
+          <path d="M8 4.5V8L10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Credits
+        <span class="credits-amount">$4.43</span>
+      </div>
+      <div class="user-row">
+        <div class="user-avatar">P</div>
+        <div class="user-info">
+          <span class="user-name">Potato</span>
+          <span class="user-meta">Admin &middot; Potato's I...</span>
+        </div>
+        <span class="user-chevron">&#9662;</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="content-wrap">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" id="page-title">Agents</h1>
+          <p class="page-subtitle" id="page-subtitle">Create and manage autonomous agents.</p>
+        </div>
+        <div class="header-actions" id="header-actions">
+          <button class="btn btn-primary">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 3.5V12.5M3.5 8H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            Create agent
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-row" id="filters"></div>
+
+      <div class="view-tabs" aria-label="Usage views">
+        <button class="view-tab active" data-view-tab="agents">Agents</button>
+        <button class="view-tab" data-view-tab="sessions">Sessions</button>
+        <button class="view-tab" data-view-tab="trace">Session trace</button>
+      </div>
+
+      <div id="view-root"></div>
+
+      <div class="footer-links">
+        <a class="footer-link" href="#">API status</a>
+        <a class="footer-link" href="#">Help and support</a>
+        <a class="footer-link" href="#">Feedback</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="detector-modal" onclick="if(event.target===this)closeDetectorModal()">
+    <section class="detector-modal" role="dialog" aria-modal="true" aria-labelledby="detector-title">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="detector-title">Configure anomaly detectors</h2>
+          <p class="modal-subtitle">
+            Flag sessions when any enabled threshold is exceeded. Email alerts still use the one-email-per-agent-per-hour cooldown.
+          </p>
+        </div>
+        <button class="modal-close" type="button" onclick="closeDetectorModal()" aria-label="Close">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.5 3.5L12.5 12.5M12.5 3.5L3.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="detector-form">
+        <div class="detector-row">
+          <div class="detector-copy">
+            <label class="switch" aria-label="Enable session cost detector">
+              <input id="detector-cost-enabled" type="checkbox" checked onchange="syncDetectorInputs()" />
+              <span class="switch-track"></span>
+            </label>
+            <div class="detector-text">
+              <div class="detector-label">Session cost</div>
+              <div class="detector-hint">Alert when a single session costs more than this amount.</div>
+            </div>
+          </div>
+          <label class="threshold-input">
+            <span class="threshold-prefix">$</span>
+            <input id="detector-cost" type="number" min="0.01" step="0.01" value="5" oninput="updateDetectorPreview()" />
+            <span class="threshold-suffix">USD</span>
+          </label>
+        </div>
+
+        <div class="detector-row">
+          <div class="detector-copy">
+            <label class="switch" aria-label="Enable tokens used detector">
+              <input id="detector-tokens-enabled" type="checkbox" checked onchange="syncDetectorInputs()" />
+              <span class="switch-track"></span>
+            </label>
+            <div class="detector-text">
+              <div class="detector-label">Tokens used</div>
+              <div class="detector-hint">Alert when input, output, and retry tokens pass this total.</div>
+            </div>
+          </div>
+          <label class="threshold-input">
+            <span class="threshold-prefix"></span>
+            <input id="detector-tokens" type="number" min="1000" step="1000" value="100000" oninput="updateDetectorPreview()" />
+            <span class="threshold-suffix">tokens</span>
+          </label>
+        </div>
+
+        <div class="detector-row">
+          <div class="detector-copy">
+            <label class="switch" aria-label="Enable time spent detector">
+              <input id="detector-duration-enabled" type="checkbox" checked onchange="syncDetectorInputs()" />
+              <span class="switch-track"></span>
+            </label>
+            <div class="detector-text">
+              <div class="detector-label">Time spent</div>
+              <div class="detector-hint">Alert when a session runs longer than this duration.</div>
+            </div>
+          </div>
+          <label class="threshold-input">
+            <span class="threshold-prefix"></span>
+            <input id="detector-duration" type="number" min="1" step="1" value="15" oninput="updateDetectorPreview()" />
+            <span class="threshold-suffix">min</span>
+          </label>
+        </div>
+
+        <div class="detector-row">
+          <div class="detector-copy">
+            <label class="switch" aria-label="Enable email alerts">
+              <input id="detector-email-enabled" type="checkbox" checked onchange="updateDetectorPreview()" />
+              <span class="switch-track"></span>
+            </label>
+            <div class="detector-text">
+              <div class="detector-label">Email alerts</div>
+              <div class="detector-hint">Send an email to the agent creator when a session is flagged.</div>
+            </div>
+          </div>
+          <div class="email-alert-summary">Creator email<br />1h cooldown</div>
+        </div>
+
+        <div class="detector-note">
+          <strong>Email alerts:</strong> when enabled, alerts include agent name, session ID, cost, tokens,
+          duration, trigger reason, and a direct trace link.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="preview-count" id="detector-preview"></div>
+        <div class="modal-actions">
+          <button class="btn" type="button" onclick="resetDetectorDefaults()">Reset defaults</button>
+          <button class="btn btn-primary" type="button" onclick="saveDetectorConfig()">Save</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const THRESHOLDS = {
+      costEnabled: true,
+      cost: 5,
+      tokensEnabled: true,
+      tokens: 100000,
+      durationEnabled: true,
+      durationSeconds: 900,
+      emailEnabled: true,
+    };
+
+    const agents = [
+      {
+        id: 'agent_01J_fkGbPW',
+        shortId: 'agent_...fkGbPW',
+        name: 'Coding Assistant',
+        model: 'claude-opus-4-8',
+        status: 'Active',
+        creator: 'michael@potato.dev',
+        lastUpdated: '2 min ago',
+      },
+      {
+        id: 'agent_01J_hvNkJZ',
+        shortId: 'agent_...hvNkJZ',
+        name: 'Coding Assistant',
+        model: 'claude-opus-4-8',
+        status: 'Active',
+        creator: 'maya@potato.dev',
+        lastUpdated: '18 min ago',
+      },
+      {
+        id: 'agent_01J_UiPRDK',
+        shortId: 'agent_...UiPRDK',
+        name: 'Stock Market News Agent',
+        model: 'claude-sonnet-4-6',
+        status: 'Active',
+        creator: 'alex@potato.dev',
+        lastUpdated: '1h ago',
+      },
+      {
+        id: 'agent_01J_Pa2KdM',
+        shortId: 'agent_...Pa2KdM',
+        name: 'Doc Summarizer',
+        model: 'claude-haiku-4-5',
+        status: 'Active',
+        creator: 'nina@potato.dev',
+        lastUpdated: '3h ago',
+      },
+    ];
+
+    const sessions = [
+      {
+        id: 'sesn_01_xr924f',
+        shortId: 'sesn_01...xr924f',
+        name: 'Fix websocket reconnect loop',
+        agentId: 'agent_01J_fkGbPW',
+        status: 'completed',
+        cost: 8.41,
+        tokens: 910000,
+        durationSeconds: 1124,
+        updated: '2 min ago',
+        emailMinutesAgo: 22,
+      },
+      {
+        id: 'sesn_01_q7cJhj',
+        shortId: 'sesn_01...q7cJhj',
+        name: 'Quickstart session',
+        agentId: 'agent_01J_fkGbPW',
+        status: 'completed',
+        cost: 2.18,
+        tokens: 82000,
+        durationSeconds: 412,
+        updated: '22 min ago',
+        emailMinutesAgo: null,
+      },
+      {
+        id: 'sesn_01_oam5S4',
+        shortId: 'sesn_01...oam5S4',
+        name: 'Research supplier contract terms',
+        agentId: 'agent_01J_hvNkJZ',
+        status: 'running',
+        cost: 4.88,
+        tokens: 124000,
+        durationSeconds: 968,
+        updated: '31 min ago',
+        emailMinutesAgo: 71,
+      },
+      {
+        id: 'sesn_01_rNk32j',
+        shortId: 'sesn_01...rNk32j',
+        name: 'Find market-moving earnings notes',
+        agentId: 'agent_01J_UiPRDK',
+        status: 'completed',
+        cost: 5.74,
+        tokens: 137000,
+        durationSeconds: 716,
+        updated: '47 min ago',
+        emailMinutesAgo: 83,
+      },
+      {
+        id: 'sesn_01_vP82mk',
+        shortId: 'sesn_01...vP82mk',
+        name: 'Summarize vendor onboarding guide',
+        agentId: 'agent_01J_Pa2KdM',
+        status: 'completed',
+        cost: 0.43,
+        tokens: 21000,
+        durationSeconds: 98,
+        updated: '1h ago',
+        emailMinutesAgo: null,
+      },
+      {
+        id: 'sesn_01_Lp7Wc2',
+        shortId: 'sesn_01...Lp7Wc2',
+        name: 'Generate OpenAPI spec',
+        agentId: 'agent_01J_fkGbPW',
+        status: 'failed',
+        cost: 7.12,
+        tokens: 258000,
+        durationSeconds: 1532,
+        updated: '2h ago',
+        emailMinutesAgo: 38,
+      },
+      {
+        id: 'sesn_01_Kt9qR4',
+        shortId: 'sesn_01...Kt9qR4',
+        name: 'Draft migration checklist',
+        agentId: 'agent_01J_hvNkJZ',
+        status: 'completed',
+        cost: 1.07,
+        tokens: 46000,
+        durationSeconds: 284,
+        updated: '2h ago',
+        emailMinutesAgo: null,
+      },
+    ];
+
+    let currentView = 'agents';
+    let selectedAgentId = null;
+    let selectedSessionId = 'sesn_01_xr924f';
+    let showAnomaliesOnly = false;
+
+    const root = document.getElementById('view-root');
+    const filters = document.getElementById('filters');
+    const pageTitle = document.getElementById('page-title');
+    const pageSubtitle = document.getElementById('page-subtitle');
+    const headerActions = document.getElementById('header-actions');
+    const detectorModal = document.getElementById('detector-modal');
+
+    const agentIcon = `
+      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="4" r="1.5" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="8" cy="8" r="1.5" stroke="currentColor" stroke-width="1.1"/>
+        <path d="M5 5L7 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    function findAgent(id) {
+      return agents.find(agent => agent.id === id);
+    }
+
+    function findSession(id) {
+      return sessions.find(session => session.id === id);
+    }
+
+    function thresholdCostLabel(config = THRESHOLDS) {
+      return `$${stripTrailing(Number(config.cost).toFixed(2))}`;
+    }
+
+    function thresholdDurationLabel(config = THRESHOLDS) {
+      const minutes = Math.round(config.durationSeconds / 60);
+      return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+    }
+
+    function getReasons(session, config = THRESHOLDS) {
+      const reasons = [];
+      if (config.costEnabled && session.cost > config.cost) reasons.push(`Cost exceeded ${thresholdCostLabel(config)} threshold`);
+      if (config.tokensEnabled && session.tokens > config.tokens) reasons.push(`Tokens exceeded ${formatTokens(config.tokens)} threshold`);
+      if (config.durationEnabled && session.durationSeconds > config.durationSeconds) reasons.push(`Duration exceeded ${thresholdDurationLabel(config)} threshold`);
+      return reasons;
+    }
+
+    function getPrimaryReason(session, config = THRESHOLDS) {
+      return getReasons(session, config)[0] || '';
+    }
+
+    function isAnomalous(session, config = THRESHOLDS) {
+      return getReasons(session, config).length > 0;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+      }[char]));
+    }
+
+    function formatCurrency(value) {
+      return `$${value.toFixed(2)}`;
+    }
+
+    function formatTokens(value) {
+      if (value >= 1000000) return `${stripTrailing((value / 1000000).toFixed(2))}M`;
+      if (value >= 1000) return `${Math.round(value / 1000)}K`;
+      return String(value);
+    }
+
+    function stripTrailing(value) {
+      return value.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+    }
+
+    function formatDuration(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      if (mins < 1) return `${secs}s`;
+      return `${mins}m ${secs}s`;
+    }
+
+    function formatDurationLong(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}m ${secs.toString().padStart(2, '0')}s`;
+    }
+
+    function statusLabel(status) {
+      return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+
+    function usageForAgent(agentId) {
+      const related = sessions.filter(session => session.agentId === agentId);
+      return {
+        cost: related.reduce((sum, session) => sum + session.cost, 0),
+        tokens: related.reduce((sum, session) => sum + session.tokens, 0),
+        anomalies: related.filter(session => isAnomalous(session)).length,
+      };
+    }
+
+    function metricClass(session, metric) {
+      if (metric === 'cost' && THRESHOLDS.costEnabled && session.cost > THRESHOLDS.cost) return 'high';
+      if (metric === 'tokens' && THRESHOLDS.tokensEnabled && session.tokens > THRESHOLDS.tokens) return 'high';
+      if (metric === 'duration' && THRESHOLDS.durationEnabled && session.durationSeconds > THRESHOLDS.durationSeconds) return 'high';
+      return '';
+    }
+
+    function emailStatus(session) {
+      if (!THRESHOLDS.emailEnabled) return { label: 'Off', className: 'none' };
+      if (!isAnomalous(session)) return { label: 'None', className: 'none' };
+      if (session.emailMinutesAgo !== null && session.emailMinutesAgo < 60) {
+        return { label: `${60 - session.emailMinutesAgo}m cooldown`, className: 'cooldown' };
+      }
+      return { label: 'Email sent', className: 'sent' };
+    }
+
+    function directTraceLink(session) {
+      return `https://console.anthropic.com/managed-agents/sessions/${session.id}/trace`;
+    }
+
+    function detectorSummary(config = THRESHOLDS) {
+      const parts = [];
+      if (config.costEnabled) parts.push(thresholdCostLabel(config));
+      if (config.tokensEnabled) parts.push(formatTokens(config.tokens));
+      if (config.durationEnabled) parts.push(`${Math.round(config.durationSeconds / 60)}m`);
+      return parts.length ? parts.join(' / ') : 'Off';
+    }
+
+    function setView(view, options = {}) {
+      currentView = view;
+      if (options.agentId !== undefined) selectedAgentId = options.agentId;
+      if (options.sessionId) selectedSessionId = options.sessionId;
+
+      document.querySelectorAll('[data-view-tab]').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.viewTab === view);
+      });
+      document.querySelectorAll('[data-view-link]').forEach(link => {
+        const shouldActivate = (view === 'agents' && link.dataset.viewLink === 'agents') ||
+          (view !== 'agents' && link.dataset.viewLink === 'sessions');
+        link.classList.toggle('active', shouldActivate);
+      });
+
+      if (view === 'agents') renderAgentsView();
+      if (view === 'sessions') renderSessionsView();
+      if (view === 'trace') renderTraceView();
+      history.replaceState(null, '', `#${view}`);
+    }
+
+    function renderFilters(view) {
+      const searchPlaceholder = view === 'agents' ? 'Search by name or exact ID' : 'Search by session ID';
+      const agentFilter = selectedAgentId ? findAgent(selectedAgentId).name : 'All';
+      const detectorChip = view === 'sessions' || view === 'trace' ? `
+        <button class="filter-chip" type="button" onclick="openDetectorModal()">
+          <span class="filter-chip-label">Detectors</span>
+          <span>${detectorSummary()}</span>
+          <span class="filter-chip-chevron">&#9662;</span>
+        </button>
+      ` : '';
+      filters.innerHTML = `
+        <div class="search-input">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3" />
+            <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+          </svg>
+          <input type="text" placeholder="${searchPlaceholder}" />
+        </div>
+        <button class="filter-chip" type="button">
+          <span class="filter-chip-label">Created</span>
+          <span>All time</span>
+          <span class="filter-chip-chevron">&#9662;</span>
+        </button>
+        ${view === 'sessions' || view === 'trace' ? `
+          <button class="filter-chip" type="button" onclick="clearAgentFilter()">
+            <span class="filter-chip-label">Agent</span>
+            <span>${escapeHtml(agentFilter)}</span>
+            <span class="filter-chip-chevron">&#9662;</span>
+          </button>
+        ` : ''}
+        <button class="filter-chip" type="button">
+          <span class="filter-chip-label">Status</span>
+          <span>Active</span>
+          <span class="filter-chip-chevron">&#9662;</span>
+        </button>
+        ${detectorChip}
+        <button class="filter-chip ${showAnomaliesOnly ? 'active' : ''}" type="button" onclick="toggleAnomalyFilter()">
+          <span class="filter-chip-label">Anomaly</span>
+          <span>${showAnomaliesOnly ? 'Flagged' : 'All'}</span>
+          <span class="filter-chip-chevron">&#9662;</span>
+        </button>
+      `;
+    }
+
+    function renderAgentsView() {
+      pageTitle.textContent = 'Agents';
+      pageSubtitle.textContent = 'Create and manage autonomous agents.';
+      headerActions.innerHTML = `
+        <button class="btn btn-primary" type="button">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3.5V12.5M3.5 8H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          Create agent
+        </button>
+      `;
+      renderFilters('agents');
+
+      const rows = agents.map(agent => {
+        const usage = usageForAgent(agent.id);
+        const hasAnomalies = usage.anomalies > 0;
+        return `
+          <tr onclick="openAgentSessions('${agent.id}')">
+            <td>
+              <div class="name-cell">
+                <span class="name-icon">${agentIcon}</span>
+                <span class="name-stack">
+                  <span class="name-primary">${escapeHtml(agent.name)}</span>
+                  <span class="name-secondary mono">${agent.shortId}</span>
+                </span>
+              </div>
+            </td>
+            <td><span class="model-chip">${agent.model}</span></td>
+            <td><span class="status-badge active">${agent.status}</span></td>
+            <td><span class="metric ${THRESHOLDS.costEnabled && usage.cost > THRESHOLDS.cost ? 'high' : ''}">${formatCurrency(usage.cost)}</span></td>
+            <td><span class="metric ${THRESHOLDS.tokensEnabled && usage.tokens > THRESHOLDS.tokens ? 'high' : ''}">${formatTokens(usage.tokens)}</span></td>
+            <td>
+              <span class="anomaly-badge ${hasAnomalies ? 'alert' : 'none'}">
+                ${hasAnomalies ? usage.anomalies : 'None'}
+              </span>
+            </td>
+            <td><span class="muted-val">${agent.lastUpdated}</span></td>
+            <td class="row-actions-cell">
+              <button class="dots-btn" onclick="event.stopPropagation()" aria-label="More actions">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="3.5" r="1.1" fill="currentColor"/>
+                  <circle cx="8" cy="8" r="1.1" fill="currentColor"/>
+                  <circle cx="8" cy="12.5" r="1.1" fill="currentColor"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      root.innerHTML = `
+        <div class="usage-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Agent</th>
+                <th>Model</th>
+                <th>Status</th>
+                <th>24h cost</th>
+                <th>24h tokens</th>
+                <th>Anomalies</th>
+                <th>Last updated</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        ${paginationMarkup()}
+      `;
+    }
+
+    function renderSessionsView() {
+      pageTitle.textContent = 'Sessions';
+      pageSubtitle.textContent = 'Trace and debug Claude Managed Agents sessions.';
+      headerActions.innerHTML = `
+        <button class="btn btn-secondary" type="button" onclick="openDetectorModal()">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 4.5H13M5.5 8H10.5M7 11.5H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Configure anomaly detectors
+        </button>
+        <button class="btn btn-primary" type="button">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3.5V12.5M3.5 8H12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          Create session
+        </button>
+      `;
+      renderFilters('sessions');
+
+      let visibleSessions = selectedAgentId
+        ? sessions.filter(session => session.agentId === selectedAgentId)
+        : sessions;
+      if (showAnomaliesOnly) visibleSessions = visibleSessions.filter(session => isAnomalous(session));
+
+      const rows = visibleSessions.map(session => {
+        const agent = findAgent(session.agentId);
+        const reasons = getReasons(session);
+        const anomaly = reasons.length > 0;
+        const email = emailStatus(session);
+        return `
+          <tr onclick="openTrace('${session.id}')">
+            <td>
+              <div class="name-cell">
+                <span class="name-icon">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3.5H13V12.5H3V3.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                    <path d="M5 6H11M5 8.5H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="name-stack">
+                  <span class="name-primary">${escapeHtml(session.name)}</span>
+                  <span class="name-secondary mono">${session.shortId}</span>
+                </span>
+              </div>
+            </td>
+            <td><span class="agent-chip">${agentIcon}${escapeHtml(agent.name)}</span></td>
+            <td><span class="status-badge ${session.status}">${statusLabel(session.status)}</span></td>
+            <td><span class="metric ${metricClass(session, 'cost')}">${formatCurrency(session.cost)}</span></td>
+            <td><span class="metric ${metricClass(session, 'tokens')}">${formatTokens(session.tokens)}</span></td>
+            <td><span class="metric ${metricClass(session, 'duration')}">${formatDuration(session.durationSeconds)}</span></td>
+            <td>
+              <span class="anomaly-badge ${anomaly ? 'alert' : 'none'}">
+                ${anomaly ? 'Anomaly' : 'None'}
+              </span>
+            </td>
+            <td><span class="email-badge ${email.className}">${email.label}</span></td>
+            <td class="row-actions-cell">
+              <button class="dots-btn" onclick="event.stopPropagation()" aria-label="More actions">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="8" cy="3.5" r="1.1" fill="currentColor"/>
+                  <circle cx="8" cy="8" r="1.1" fill="currentColor"/>
+                  <circle cx="8" cy="12.5" r="1.1" fill="currentColor"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      root.innerHTML = `
+        <div class="usage-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>Agent</th>
+                <th>Status</th>
+                <th>Cost</th>
+                <th>Tokens</th>
+                <th>Duration</th>
+                <th>Anomaly</th>
+                <th>Email</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        ${paginationMarkup()}
+      `;
+    }
+
+    function renderTraceView() {
+      const session = findSession(selectedSessionId) || sessions[0];
+      selectedSessionId = session.id;
+      const agent = findAgent(session.agentId);
+      const reasons = getReasons(session);
+      const anomaly = reasons.length > 0;
+      const email = emailStatus(session);
+
+      pageTitle.textContent = 'Session trace';
+      pageSubtitle.textContent = `${session.shortId} - ${agent.name}`;
+      headerActions.innerHTML = `
+        <button class="btn btn-secondary" type="button" onclick="openDetectorModal()">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 4.5H13M5.5 8H10.5M7 11.5H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Configure anomaly detectors
+        </button>
+        <button class="btn btn-primary" type="button">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8H13M13 8L9.5 4.5M13 8L9.5 11.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Open trace
+        </button>
+      `;
+      renderFilters('trace');
+
+      const reasonText = reasons.length > 1 ? reasons.join('; ') : getPrimaryReason(session);
+      const emailSubject = `Usage anomaly detected for ${agent.name}`;
+
+      root.innerHTML = `
+        <div class="detail-shell">
+          <section class="trace-panel">
+            <div class="trace-head">
+              <div>
+                <div class="trace-title">${escapeHtml(session.name)}</div>
+                <div class="trace-meta">
+                  <span><span class="mono">${session.shortId}</span></span>
+                  <span>${formatCurrency(session.cost)}</span>
+                  <span>${formatTokens(session.tokens)} tokens</span>
+                  <span>${formatDuration(session.durationSeconds)}</span>
+                </div>
+              </div>
+              <span class="status-badge ${session.status}">${statusLabel(session.status)}</span>
+            </div>
+
+            <div class="anomaly-banner ${anomaly ? 'visible' : ''}">
+              <div class="banner-title">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 2L14 13H2L8 2Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+                  <path d="M8 6V9M8 11.5V11.55" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+                </svg>
+                Usage anomaly detected
+              </div>
+              <div class="banner-copy">
+                This session cost ${formatCurrency(session.cost)}, used ${formatTokens(session.tokens)} tokens, and ran for ${formatDurationLong(session.durationSeconds)}.
+              </div>
+              <div class="banner-reason">Triggered because ${reasonText.toLowerCase()}.</div>
+            </div>
+
+            <div class="trace-body">
+              <div class="trace-steps">
+                <div class="trace-step">
+                  <div class="step-time">00:00</div>
+                  <div class="step-main">
+                    <div class="step-title">User request received</div>
+                    <div class="step-sub">Analyze reconnect loop and patch the affected client code.</div>
+                  </div>
+                  <div class="step-cost">$0.02</div>
+                </div>
+                <div class="trace-step">
+                  <div class="step-time">02:14</div>
+                  <div class="step-main">
+                    <div class="step-title">Model call</div>
+                    <div class="step-sub">claude-opus-4-8 planned file search, reproduction, and patch steps.</div>
+                  </div>
+                  <div class="step-cost">$1.87</div>
+                </div>
+                <div class="trace-step">
+                  <div class="step-time">07:52</div>
+                  <div class="step-main">
+                    <div class="step-title">Tool calls retried</div>
+                    <div class="step-sub">Repeated test runner and code search calls increased token volume.</div>
+                  </div>
+                  <div class="step-cost">$3.94</div>
+                </div>
+                <div class="trace-step">
+                  <div class="step-time">15:18</div>
+                  <div class="step-main">
+                    <div class="step-title">Patch generated</div>
+                    <div class="step-sub">Updated websocket backoff logic and summarized verification output.</div>
+                  </div>
+                  <div class="step-cost">$2.58</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="email-panel">
+            <div class="side-title">
+              <span>Email alert</span>
+              <span class="email-badge ${email.className}">${email.label}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">To</span>
+              <span class="email-value">${agent.creator}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Subject</span>
+              <span class="email-value">${emailSubject}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Agent</span>
+              <span class="email-value">${agent.name}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Session</span>
+              <span class="email-value">${session.shortId}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Cost</span>
+              <span class="email-value">${formatCurrency(session.cost)}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Tokens</span>
+              <span class="email-value">${formatTokens(session.tokens)}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Duration</span>
+              <span class="email-value">${formatDuration(session.durationSeconds)}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Reason</span>
+              <span class="email-value">${reasonText || 'None'}</span>
+            </div>
+            <div class="email-line">
+              <span class="email-label">Trace</span>
+              <a class="email-value email-link" href="${directTraceLink(session)}">${session.shortId}</a>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
+    function paginationMarkup() {
+      return `
+        <div class="pagination">
+          <button class="page-btn" aria-label="Previous page">
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.5 2.5L3.5 6L7.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="page-btn" aria-label="Next page">
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+      `;
+    }
+
+    function openAgentSessions(agentId) {
+      setView('sessions', { agentId });
+    }
+
+    function openTrace(sessionId) {
+      setView('trace', { sessionId });
+    }
+
+    function clearAgentFilter() {
+      selectedAgentId = null;
+      renderSessionsView();
+    }
+
+    function toggleAnomalyFilter() {
+      showAnomaliesOnly = !showAnomaliesOnly;
+      if (currentView === 'agents') renderAgentsView();
+      if (currentView === 'sessions') renderSessionsView();
+      if (currentView === 'trace') renderTraceView();
+    }
+
+    function detectorField(id) {
+      return document.getElementById(id);
+    }
+
+    function getDetectorDraft() {
+      const cost = Number(detectorField('detector-cost').value);
+      const tokens = Number(detectorField('detector-tokens').value);
+      const durationMinutes = Number(detectorField('detector-duration').value);
+      return {
+        costEnabled: detectorField('detector-cost-enabled').checked,
+        cost: Number.isFinite(cost) && cost > 0 ? cost : 5,
+        tokensEnabled: detectorField('detector-tokens-enabled').checked,
+        tokens: Number.isFinite(tokens) && tokens > 0 ? Math.round(tokens) : 100000,
+        durationEnabled: detectorField('detector-duration-enabled').checked,
+        durationSeconds: Number.isFinite(durationMinutes) && durationMinutes > 0 ? Math.round(durationMinutes * 60) : 900,
+        emailEnabled: detectorField('detector-email-enabled').checked,
+      };
+    }
+
+    function setDetectorModalValues(config) {
+      detectorField('detector-cost-enabled').checked = config.costEnabled;
+      detectorField('detector-cost').value = stripTrailing(Number(config.cost).toFixed(2));
+      detectorField('detector-tokens-enabled').checked = config.tokensEnabled;
+      detectorField('detector-tokens').value = config.tokens;
+      detectorField('detector-duration-enabled').checked = config.durationEnabled;
+      detectorField('detector-duration').value = Math.round(config.durationSeconds / 60);
+      detectorField('detector-email-enabled').checked = config.emailEnabled;
+      syncDetectorInputs();
+    }
+
+    function syncDetectorInputs() {
+      detectorField('detector-cost').disabled = !detectorField('detector-cost-enabled').checked;
+      detectorField('detector-tokens').disabled = !detectorField('detector-tokens-enabled').checked;
+      detectorField('detector-duration').disabled = !detectorField('detector-duration-enabled').checked;
+      updateDetectorPreview();
+    }
+
+    function updateDetectorPreview() {
+      const draft = getDetectorDraft();
+      const enabledCount = [
+        draft.costEnabled,
+        draft.tokensEnabled,
+        draft.durationEnabled,
+      ].filter(Boolean).length;
+      const matching = sessions.filter(session => isAnomalous(session, draft)).length;
+      const preview = detectorField('detector-preview');
+
+      const emailText = draft.emailEnabled ? 'Email alerts are on.' : 'Email alerts are off.';
+
+      if (enabledCount === 0) {
+        preview.innerHTML = `No detectors enabled. No sessions would alert. ${emailText}`;
+        return;
+      }
+
+      preview.innerHTML = `<strong>${matching}</strong> current session${matching === 1 ? '' : 's'} would trigger ${enabledCount} enabled detector${enabledCount === 1 ? '' : 's'}. ${emailText}`;
+    }
+
+    function openDetectorModal() {
+      setDetectorModalValues(THRESHOLDS);
+      detectorModal.classList.add('open');
+    }
+
+    function closeDetectorModal() {
+      detectorModal.classList.remove('open');
+    }
+
+    function resetDetectorDefaults() {
+      setDetectorModalValues({
+        costEnabled: true,
+        cost: 5,
+        tokensEnabled: true,
+        tokens: 100000,
+        durationEnabled: true,
+        durationSeconds: 900,
+        emailEnabled: true,
+      });
+    }
+
+    function saveDetectorConfig() {
+      const draft = getDetectorDraft();
+      THRESHOLDS.costEnabled = draft.costEnabled;
+      THRESHOLDS.cost = draft.cost;
+      THRESHOLDS.tokensEnabled = draft.tokensEnabled;
+      THRESHOLDS.tokens = draft.tokens;
+      THRESHOLDS.durationEnabled = draft.durationEnabled;
+      THRESHOLDS.durationSeconds = draft.durationSeconds;
+      THRESHOLDS.emailEnabled = draft.emailEnabled;
+      closeDetectorModal();
+
+      if (currentView === 'agents') renderAgentsView();
+      if (currentView === 'sessions') renderSessionsView();
+      if (currentView === 'trace') renderTraceView();
+    }
+
+    document.querySelectorAll('[data-view-tab]').forEach(tab => {
+      tab.addEventListener('click', () => setView(tab.dataset.viewTab));
+    });
+
+    document.querySelectorAll('[data-view-link]').forEach(link => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        setView(link.dataset.viewLink);
+      });
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeDetectorModal();
+    });
+
+    const initialView = location.hash.replace('#', '');
+    if (['agents', 'sessions', 'trace'].includes(initialView)) {
+      setView(initialView);
+    } else {
+      setView('agents');
+    }
+  </script>
+</body>
+
+</html>
