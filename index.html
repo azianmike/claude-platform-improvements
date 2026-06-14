@@ -638,7 +638,7 @@
 
       <h2 class="doc-h2">So what problems do these developers have? And what should we build?</h2>
       <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
-          intuition + customer feedback in public spaces like X</em></p>
+          intuition + customer feedback from public spaces like X</em></p>
 
       <p class="problem-head"><strong>Problem #1:</strong> As AI-native startups scale quickly, Claude usage can spike
         quickly and teams may hit rate limits on their primary model, causing 429s.</p>
@@ -717,9 +717,11 @@
           </ul>
         </li>
         <li>Hypothesis: If developers can observe and detect long-running agent costs, they will feel safer moving more
-          agent workloads into production on Claude instead of limiting rollout or routing work elsewhere.</li>
-        <li>Success metrics: Increase number of production agents using Claude, increase token spend from
-          capped/monitored agents, reduce support tickets, and reduce churn risk.</li>
+          agent workloads into production on Managed Agents instead of limiting rollout or routing work elsewhere.
+          Additionally, this will increase adoption of our Managed Agent product instead of users building their own
+          agents.</li>
+        <li>Success metrics: Increase Managed Agent usage, increase token spend from
+          monitored agents, reduce support tickets, and reduce churn risk.</li>
         <li>Risks: It could reduce revenue. Mitigate via the counter-metric above; default caps to generous/off; frame
           UI around anomaly protection, not budgeting down.</li>
       </ul>
@@ -763,8 +765,7 @@
         <li>Solution (big bet, 1–2 months eng): Claude Agent Eval Workbench, built on Managed Agents. Teams define eval
           suites, pick a baseline and candidate agent version, run both across the same scenarios, and compare final
           outputs, tool calls, event traces, success rate, latency, and token/session cost. Grading combines
-          deterministic checks and a human review queue to flag likely regressions — this is the hard part and the
-          differentiator, since raw tracing already exists.</li>
+          deterministic checks and a human review queue to flag regressions.</li>
         <li>Hypothesis: If developers can reliably evaluate long-horizon agent changes before production, they will
           iterate faster, adopt new Claude models sooner, and scale more agent workloads on Claude with confidence.</li>
         <li>Success metrics: Increase eval runs per active org, increase new model adoption among agent-building orgs,
