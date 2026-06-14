@@ -594,8 +594,14 @@
       margin: 18px 28px 0;
       border: 1px solid var(--border-light);
       border-radius: 7px;
-      overflow: hidden;
       background: #161616;
+      flex-shrink: 0;
+    }
+
+    .content-header,
+    .search-bar-wrap,
+    .table-wrap {
+      flex-shrink: 0;
     }
 
     .tier-header {
@@ -665,8 +671,8 @@
 
     .tier-fill {
       height: 100%;
-      width: 28%;
-      background: linear-gradient(90deg, #c0392b 0%, #e05252 100%);
+      width: 20%;
+      background: linear-gradient(90deg, #d4793a 0%, #e89465 100%);
       border-radius: 3px;
       position: relative;
     }
@@ -710,7 +716,7 @@
     }
 
     .tier-label-price.active {
-      color: #c0392b;
+      color: #d4793a;
       font-weight: 600;
     }
 
@@ -1017,7 +1023,7 @@
   <main class="main">
 
     <!-- Header -->
-    <div class="content-header">
+    <div class="content-header" data-tour="page-header">
       <div>
         <h1 class="page-title">Rate limits</h1>
         <p class="page-subtitle">Peak-minute usage against each rate limit over the last 24 hours. Model versions in a
@@ -1038,7 +1044,7 @@
     </div>
 
     <!-- ═══ RATE LIMIT TIERS SECTION ═══ -->
-    <div class="tier-section" id="tier-section">
+    <div class="tier-section" id="tier-section" data-tour="tier-section">
 
       <!-- Header row -->
       <div class="tier-header">
@@ -1050,11 +1056,12 @@
             <a href="#">Learn more</a>
           </div>
         </div>
-        <button class="btn-upgrade" id="btn-upgrade" onclick="openCreditsModal()">Upgrade tier</button>
+        <button class="btn-upgrade" id="btn-upgrade" data-tour="tier-upgrade-button"
+          onclick="openCreditsModal()">Upgrade tier</button>
       </div>
 
       <!-- Tier progress bar -->
-      <div class="tier-progress-wrap">
+      <div class="tier-progress-wrap" data-tour="tier-progress">
         <div class="tier-track">
           <div class="tier-fill"></div>
           <!-- separator ticks at 20%, 40%, 60%, 80% -->
@@ -1100,7 +1107,7 @@
       </div>
 
       <!-- Tier tabs -->
-      <div class="tier-tabs" id="tier-tabs">
+      <div class="tier-tabs" id="tier-tabs" data-tour="tier-tabs">
         <div class="tier-tab" data-tier="free" onclick="switchTier(this, 'free')">Free tier</div>
         <div class="tier-tab active" data-tier="tier1" onclick="switchTier(this, 'tier1')">
           Tier 1
@@ -1143,7 +1150,7 @@
     </div>
 
     <!-- Table -->
-    <div class="table-wrap">
+    <div class="table-wrap" data-tour="quotas-table">
       <table id="quotas-table">
         <thead>
           <tr>
@@ -1353,6 +1360,7 @@
         // Clamp bar width at 100% visually even if over
         const barWidth = Math.min(q.pct, 100);
         const isOver = q.pct > 100;
+        if (isOver) tr.setAttribute('data-tour', 'over-limit-row');
 
         // bar fill class
         let fillClass = 'default';
@@ -1404,11 +1412,10 @@
 
   <!-- ═══════════════════════ ADD CREDITS MODAL ═══════════════════════ -->
   <style>
-    /* Overlay */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.72);
+      background: rgba(0, 0, 0, 0.65);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1423,19 +1430,17 @@
       pointer-events: all;
     }
 
-    /* Dialog box */
     .modal-box {
       background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 10px;
-      width: 360px;
+      border: 1px solid #2e2e2e;
+      border-radius: 14px;
+      width: 460px;
       max-width: calc(100vw - 32px);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
-      transform: translateY(10px) scale(0.98);
+      transform: translateY(8px) scale(0.985);
       transition: transform 0.18s ease, opacity 0.18s ease;
       opacity: 0;
-      padding: 0;
-      overflow: hidden;
+      padding: 22px 22px 20px;
     }
 
     .modal-overlay.open .modal-box {
@@ -1443,457 +1448,469 @@
       opacity: 1;
     }
 
-    /* Header */
     .modal-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      padding: 20px 20px 0;
+      gap: 12px;
+      margin-bottom: 4px;
     }
 
     .modal-title {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
-      color: #e8e8e8;
-      margin-bottom: 6px;
-    }
-
-    .modal-subtitle {
-      font-size: 12px;
-      color: #888;
-      line-height: 1.5;
-      max-width: 280px;
-    }
-
-    .modal-subtitle a {
-      color: #5ba3e8;
-      text-decoration: none;
-    }
-
-    .modal-subtitle a:hover {
-      text-decoration: underline;
+      color: var(--text-primary);
+      letter-spacing: -0.005em;
     }
 
     .modal-close {
       background: none;
       border: none;
       cursor: pointer;
-      color: #666;
-      padding: 2px;
+      color: var(--text-secondary);
+      padding: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 5px;
       transition: color 0.1s, background 0.1s;
       flex-shrink: 0;
-      margin-top: -2px;
+      margin-top: -4px;
+      margin-right: -4px;
     }
 
     .modal-close:hover {
-      color: #aaa;
+      color: var(--text-primary);
       background: #2a2a2a;
     }
 
     .modal-close svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
-    /* Preset buttons */
-    .modal-presets {
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    .modal-sub a {
+      color: var(--accent-blue, #5ba3e8);
+      text-decoration: none;
+    }
+
+    .modal-sub a:hover {
+      text-decoration: underline;
+    }
+
+    .amount-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 18px 20px 0;
+      gap: 9px;
+      margin-bottom: 20px;
     }
 
-    .preset-btn {
-      padding: 9px 6px;
-      border-radius: 6px;
+    .amount-pill {
+      background: transparent;
       border: 1px solid #333;
-      background: #242424;
-      color: #bbb;
-      font-size: 13px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 400;
       font-family: 'Inter', sans-serif;
-      font-weight: 500;
+      padding: 13px 0;
       cursor: pointer;
-      text-align: center;
-      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      transition: border-color 0.1s, background 0.1s;
     }
 
-    .preset-btn:hover {
-      background: #2c2c2c;
-      border-color: #444;
-      color: #e8e8e8;
-    }
-
-    .preset-btn.active {
-      background: #2e2e2e;
-      border-color: #e8e8e8;
-      color: #e8e8e8;
-    }
-
-    /* Amount input */
-    .modal-amount-label {
-      font-size: 11.5px;
-      color: #888;
-      padding: 14px 20px 6px;
-    }
-
-    .modal-amount-label span {
-      color: #555;
-    }
-
-    .modal-input-row {
-      display: flex;
-      align-items: center;
-      border: 1px solid #383838;
-      border-radius: 6px;
-      margin: 0 20px;
-      background: #161616;
-      transition: border-color 0.15s;
-      overflow: hidden;
-    }
-
-    .modal-input-row:focus-within {
+    .amount-pill:hover {
       border-color: #555;
     }
 
-    .modal-currency {
-      padding: 0 10px 0 14px;
-      font-size: 13px;
-      color: #888;
-      user-select: none;
-      line-height: 40px;
+    .amount-pill.active {
+      border-color: #888;
+      background: #232323;
     }
 
-    .modal-amount-input {
+    .input-label {
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .input-label .input-hint {
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+
+    .amount-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-input, #242424);
+      border: 1px solid #333;
+      border-radius: 7px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      transition: border-color 0.1s;
+    }
+
+    .amount-input-wrap:focus-within {
+      border-color: #555;
+    }
+
+    .amount-input-currency {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .amount-input-wrap input {
       flex: 1;
       background: none;
       border: none;
       outline: none;
+      color: var(--text-primary);
       font-size: 14px;
       font-family: 'Inter', sans-serif;
-      color: #e8e8e8;
-      padding: 10px 14px 10px 0;
       width: 100%;
     }
 
-    /* Summary */
-    .modal-summary {
-      margin: 16px 20px 0;
-      background: #161616;
-      border: 1px solid #2a2a2a;
-      border-radius: 7px;
-      overflow: hidden;
+    .upgrade-impact {
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid rgba(212, 121, 58, 0.32);
+      background: rgba(212, 121, 58, 0.08);
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+
+    .upgrade-impact-icon {
+      width: 18px;
+      height: 18px;
+      color: #d4793a;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .upgrade-impact-title {
+      font-size: 12.5px;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .upgrade-impact-copy {
+      font-size: 12px;
+      color: #d8b79f;
+      line-height: 1.45;
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: #2a2a2a;
+      margin: 0 -22px 16px;
+    }
+
+    .summary-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 14px;
     }
 
     .summary-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 9px 14px;
-      font-size: 12.5px;
-      color: #888;
-      border-bottom: 1px solid #222;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
     }
 
-    .summary-row:last-child {
-      border-bottom: none;
+    .summary-row .summary-val {
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
     }
 
     .summary-row.total {
-      padding: 11px 14px;
+      padding-top: 10px;
+      border-top: 1px solid #2a2a2a;
+      margin-top: 4px;
     }
 
     .summary-row.total .summary-label {
-      font-size: 13px;
-      color: #aaa;
+      color: var(--text-primary);
       font-weight: 500;
+      font-size: 13.5px;
     }
 
     .summary-row.total .summary-val {
-      font-size: 18px;
-      font-weight: 700;
-      color: #e8e8e8;
+      font-size: 16px;
+      font-weight: 600;
     }
 
-    /* Payment method */
-    .modal-payment {
+    .pay-method-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: 12px 20px 0;
-      background: #161616;
-      border: 1px solid #2a2a2a;
-      border-radius: 7px;
-      padding: 11px 14px;
+      padding: 12px 14px;
+      border: 1px solid #2e2e2e;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      background: #1a1a1a;
     }
 
-    .payment-label {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .payment-right {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .stripe-icon {
-      width: 22px;
-      height: 22px;
-      background: #00a86b;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .stripe-icon svg {
-      width: 14px;
-      height: 14px;
-      fill: #fff;
-    }
-
-    .payment-method-name {
-      font-size: 12.5px;
-      color: #d0d0d0;
+    .pay-method-label {
+      font-size: 13px;
+      color: var(--text-primary);
       font-weight: 500;
     }
 
-    .payment-edit {
+    .pay-method-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pay-stripe-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .pay-stripe-icon {
+      width: 20px;
+      height: 20px;
+      background: #00d66f;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00351c;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .pay-edit {
       background: none;
       border: none;
+      color: var(--text-secondary);
       cursor: pointer;
-      color: #555;
       padding: 2px;
       display: flex;
       align-items: center;
-      border-radius: 3px;
+      border-radius: 4px;
       transition: color 0.1s;
     }
 
-    .payment-edit:hover {
-      color: #999;
+    .pay-edit:hover {
+      color: var(--text-primary);
     }
 
-    .payment-edit svg {
-      width: 13px;
-      height: 13px;
+    .pay-edit svg {
+      width: 14px;
+      height: 14px;
     }
 
-    /* Buy button */
-    .modal-buy-btn {
-      display: block;
-      width: calc(100% - 40px);
-      margin: 14px 20px 0;
-      padding: 12px;
-      background: #fff;
+    .btn-buy {
+      width: 100%;
+      background: #f5f5f5;
       color: #111;
       border: none;
-      border-radius: 7px;
-      font-size: 13.5px;
+      border-radius: 8px;
       font-family: 'Inter', sans-serif;
+      font-size: 14px;
       font-weight: 600;
+      padding: 12px 0;
       cursor: pointer;
-      text-align: center;
-      transition: background 0.12s;
+      transition: background 0.1s;
+      margin-bottom: 12px;
     }
 
-    .modal-buy-btn:hover {
-      background: #e8e8e8;
+    .btn-buy:hover {
+      background: #fff;
     }
 
-    .modal-buy-btn:active {
-      background: #d4d4d4;
-    }
-
-    /* Disclaimer */
     .modal-disclaimer {
-      padding: 12px 20px 20px;
-      font-size: 10.5px;
-      color: #555;
-      line-height: 1.55;
-      text-align: left;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
     }
 
     .modal-disclaimer a {
-      color: #5ba3e8;
+      color: var(--accent-blue, #5ba3e8);
+      text-decoration: none;
+    }
+
+    .modal-disclaimer a:hover {
       text-decoration: underline;
     }
   </style>
 
-  <div class="modal-overlay" id="credits-modal" onclick="handleOverlayClick(event)">
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
-
-      <!-- Header -->
+  <div class="modal-overlay" id="credits-modal" onclick="if(event.target===this)closeCreditsModal()">
+    <div class="modal-box" role="dialog" aria-labelledby="credits-title" data-tour="credits-modal">
       <div class="modal-head">
-        <div>
-          <div class="modal-title" id="modal-title-text">Add credits</div>
-          <div class="modal-subtitle">
-            Your account is on Tier 1 and may use up to $500 credits/month.
-            This limit increases with usage. <a href="#">Learn more</a>
-          </div>
-        </div>
-        <button class="modal-close" onclick="closeCreditsModal()" aria-label="Close dialog">
+        <h2 class="modal-title" id="credits-title">Add credits</h2>
+        <button class="modal-close" onclick="closeCreditsModal()" aria-label="Close">
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M3.5 3.5L12.5 12.5M12.5 3.5L3.5 12.5" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" />
           </svg>
         </button>
       </div>
+      <p class="modal-sub">
+        Your account is on Tier 1 and may use up to $500 credits/month. Adding $35 brings total credit purchases to $40,
+        unlocking Tier 2 rate limits.
+        <a href="#">Learn more</a>
+      </p>
 
-      <!-- Presets -->
-      <div class="modal-presets">
-        <button class="preset-btn" data-amount="5" onclick="selectPreset(this, 5)">$5</button>
-        <button class="preset-btn" data-amount="20" onclick="selectPreset(this, 20)">$20</button>
-        <button class="preset-btn" data-amount="100" onclick="selectPreset(this, 100)">$100</button>
-        <button class="preset-btn active" data-amount="other" onclick="selectPreset(this, null)">Other</button>
+      <div class="amount-row" id="amount-pills" data-tour="amount-options">
+        <button class="amount-pill" data-amount="5">$5</button>
+        <button class="amount-pill" data-amount="20">$20</button>
+        <button class="amount-pill" data-amount="100">$100</button>
+        <button class="amount-pill active" data-amount="other">Other</button>
       </div>
 
-      <!-- Amount input -->
-      <div class="modal-amount-label">Enter amount <span>$5.00 minimum</span></div>
-      <div class="modal-input-row">
-        <span class="modal-currency">$</span>
-        <input id="credit-amount-input" class="modal-amount-input" type="number" min="5" step="1" value="35"
-          placeholder="35" oninput="onAmountChange(this.value)" />
+      <div class="input-label">
+        Enter amount
+        <span class="input-hint">$5.00 minimum</span>
+      </div>
+      <div class="amount-input-wrap" data-tour="credit-amount-input">
+        <span class="amount-input-currency">$</span>
+        <input type="number" id="credit-amount" min="5" step="1" value="35" />
       </div>
 
-      <!-- Summary -->
-      <div class="modal-summary">
+      <div class="upgrade-impact" data-tour="upgrade-impact">
+        <svg class="upgrade-impact-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 2.25L15.75 5.75V8.25C15.75 12.25 13.05 15.1 9 16C4.95 15.1 2.25 12.25 2.25 8.25V5.75L9 2.25Z"
+            stroke="currentColor" stroke-width="1.35" stroke-linejoin="round" />
+          <path d="M6.35 9.05L8.15 10.85L11.85 6.85" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <div>
+          <div class="upgrade-impact-title">Tier 2 unlock</div>
+          <div class="upgrade-impact-copy">This purchase crosses the $40 threshold, so throttled Haiku traffic gets the
+            next public rate-limit tier.</div>
+        </div>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="summary-rows" data-tour="checkout-summary">
         <div class="summary-row">
           <span class="summary-label">Usage credits</span>
-          <span class="summary-val" id="summary-credits">$35.00</span>
+          <span class="summary-val" id="sum-credits">$35.00</span>
         </div>
         <div class="summary-row">
           <span class="summary-label">Estimated tax</span>
-          <span class="summary-val" id="summary-tax">$3.69</span>
+          <span class="summary-val" id="sum-tax">$3.69</span>
         </div>
         <div class="summary-row total">
           <span class="summary-label">Total due</span>
-          <span class="summary-val" id="summary-total">$38.69</span>
+          <span class="summary-val" id="sum-total">$38.69</span>
         </div>
       </div>
 
-      <!-- Payment method -->
-      <div class="modal-payment">
-        <span class="payment-label">Payment method</span>
-        <div class="payment-right">
-          <div class="stripe-icon">
-            <!-- Stripe S icon -->
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M7.2 6.4c0-.9.8-1.3 2-.7l2.3 1.1.7-2.8C10.8 3.4 9.5 3 8 3 5.2 3 3 4.5 3 7c0 3.8 5 3.2 5 5 0 .7-.7 1.2-1.8 1.2-1.4 0-2.6-.6-3.3-1.3L2 14.7C3 15.5 4.8 16 6.5 16c2.9 0 5.5-1.4 5.5-4.1C12 8 7.2 8.7 7.2 6.4z"
-                fill="white" />
-            </svg>
-          </div>
-          <span class="payment-method-name">Link by Stripe</span>
-          <button class="payment-edit" title="Edit payment method" aria-label="Edit payment method">
+      <div class="pay-method-row">
+        <span class="pay-method-label">Payment method</span>
+        <div class="pay-method-right">
+          <span class="pay-stripe-chip">
+            <span class="pay-stripe-icon">&gt;</span>
+            Link by Stripe
+          </span>
+          <button class="pay-edit" aria-label="Edit payment method">
             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" stroke-width="1.2"
+              <path d="M10.5 2.5L13.5 5.5L5.5 13.5H2.5V10.5L10.5 2.5Z" stroke="currentColor" stroke-width="1.3"
                 stroke-linejoin="round" />
             </svg>
           </button>
         </div>
       </div>
 
-      <!-- Buy button -->
-      <button class="modal-buy-btn" id="buy-btn" onclick="handleBuy()">Buy $35 of credits</button>
+      <button class="btn-buy" id="btn-buy" data-tour="buy-credits-button">Buy $35 of credits</button>
 
-      <!-- Disclaimer -->
-      <div class="modal-disclaimer">
-        Credits are consumed with API, Claude Code, and Workbench usage, and expire 1
-        year after purchase. By clicking &ldquo;Buy credits&rdquo; you agree to
-        <a href="#">Anthropic's Credit Terms</a>
-      </div>
-
+      <p class="modal-disclaimer">
+        Credits are consumed with API, Claude Code, and Workbench usage, and expire 1 year after purchase.
+        By clicking "Buy credits" you agree to <a href="#">Anthropic's Credit Terms</a>
+      </p>
     </div>
   </div>
 
   <script>
-    // ─── MODAL LOGIC ───
-    const TAX_RATE = 0.1054; // ~10.54% effective rate to match screenshot ($3.69 on $35)
+    // ─── Add credits modal ───
+    const modal = document.getElementById('credits-modal');
+    const amountInput = document.getElementById('credit-amount');
+    const pills = document.querySelectorAll('#amount-pills .amount-pill');
+    const sumCredits = document.getElementById('sum-credits');
+    const sumTax = document.getElementById('sum-tax');
+    const sumTotal = document.getElementById('sum-total');
+    const btnBuy = document.getElementById('btn-buy');
+    const TAX_RATE = 0.1054; // ~10.54% — matches $3.69 on $35
+
+    function fmt(n) {
+      return '$' + n.toFixed(2);
+    }
+
+    function updateSummary() {
+      const raw = parseFloat(amountInput.value);
+      const v = isNaN(raw) ? 0 : raw;
+      const tax = v * TAX_RATE;
+      sumCredits.textContent = fmt(v);
+      sumTax.textContent = fmt(tax);
+      sumTotal.textContent = fmt(v + tax);
+      btnBuy.textContent = `Buy $${Math.round(v)} of credits`;
+    }
+
+    pills.forEach(p => {
+      p.addEventListener('click', () => {
+        pills.forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+        const amt = p.dataset.amount;
+        if (amt !== 'other') {
+          amountInput.value = amt;
+          updateSummary();
+        }
+        amountInput.focus();
+      });
+    });
+
+    amountInput.addEventListener('input', () => {
+      const v = amountInput.value;
+      const match = Array.from(pills).find(p => p.dataset.amount === v);
+      pills.forEach(x => x.classList.remove('active'));
+      (match || document.querySelector('[data-amount="other"]')).classList.add('active');
+      updateSummary();
+    });
 
     function openCreditsModal() {
-      document.getElementById('credits-modal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-      // Reset to "Other" preset with value 35
-      document.getElementById('credit-amount-input').value = 35;
-      selectPresetByAmount(null); // highlights "Other"
-      updateSummary(35);
+      modal.classList.add('open');
     }
 
     function closeCreditsModal() {
-      document.getElementById('credits-modal').classList.remove('open');
-      document.body.style.overflow = '';
+      modal.classList.remove('open');
     }
 
-    function handleOverlayClick(e) {
-      if (e.target === document.getElementById('credits-modal')) closeCreditsModal();
-    }
-
-    // Close on Escape
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeCreditsModal();
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) {
+        closeCreditsModal();
+      }
     });
 
-    function selectPreset(el, amount) {
-      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      if (amount !== null) {
-        document.getElementById('credit-amount-input').value = amount;
-        updateSummary(amount);
-      } else {
-        // "Other" — focus input
-        document.getElementById('credit-amount-input').focus();
-      }
-    }
+    updateSummary();
 
-    function selectPresetByAmount(amount) {
-      document.querySelectorAll('.preset-btn').forEach(b => {
-        b.classList.remove('active');
-        const ba = parseFloat(b.dataset.amount);
-        if (amount !== null && ba === amount) b.classList.add('active');
-        else if (amount === null && b.dataset.amount === 'other') b.classList.add('active');
-      });
-    }
-
-    function onAmountChange(val) {
-      const amount = parseFloat(val) || 0;
-      // Deselect presets if value doesn't match one
-      const presetAmounts = [5, 20, 100];
-      if (presetAmounts.includes(amount)) {
-        selectPresetByAmount(amount);
-      } else {
-        selectPresetByAmount(null);
-      }
-      updateSummary(amount);
-    }
-
-    function updateSummary(amount) {
-      if (isNaN(amount) || amount < 0) amount = 0;
-      const tax = amount * TAX_RATE;
-      const total = amount + tax;
-      document.getElementById('summary-credits').textContent = '$' + amount.toFixed(2);
-      document.getElementById('summary-tax').textContent = '$' + tax.toFixed(2);
-      document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
-      const label = amount >= 5 ? `Buy $${amount % 1 === 0 ? amount : amount.toFixed(2)} of credits` : 'Buy credits';
-      document.getElementById('buy-btn').textContent = label;
-    }
-
-    function handleBuy() {
-      const amount = parseFloat(document.getElementById('credit-amount-input').value);
-      if (isNaN(amount) || amount < 5) {
-        document.getElementById('credit-amount-input').style.outline = '1.5px solid #c0392b';
-        setTimeout(() => { document.getElementById('credit-amount-input').style.outline = ''; }, 1500);
-        return;
-      }
-      alert(`Purchasing $${amount.toFixed(2)} of credits via Link by Stripe.`);
-      closeCreditsModal();
-    }
+    // Expose modal helpers for the demo tour
+    window.openCreditsModal = openCreditsModal;
+    window.closeCreditsModal = closeCreditsModal;
   </script>
+
+  <script src="rate-limits-demo-tour.js"></script>
 </body>
 
 </html>
