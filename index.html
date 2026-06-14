@@ -367,6 +367,26 @@
       margin-top: 36px;
     }
 
+    .journey-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      align-items: center;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      font-size: 13.5px !important;
+      color: var(--text) !important;
+      line-height: 1.5 !important;
+      margin-bottom: 20px !important;
+    }
+
+    .journey-arrow {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
     /* ── PAGE LINKS ── */
     .page-links {
       margin-top: 48px;
@@ -637,6 +657,28 @@
         <li><strong>Counter-metrics:</strong> support ticket volume, fraud/abuse, account takeovers, credit card
           disputes and refunds</li>
       </ul>
+      <h2 class="doc-h2">The developer journey</h2>
+      <p>Before we figure out how to move our metrics, it's important to understand how developers use our Platform. As
+        a developer who's used the Claude Platform, my intuition tells me a common path looks like this:</p>
+      <p class="journey-path">
+        Discover &amp; evaluate <span class="journey-arrow">→</span>
+        Onboard <span class="journey-arrow">→</span>
+        First API call <span class="journey-arrow">→</span>
+        Build first use case <span class="journey-arrow">→</span>
+        Move to production <span class="journey-arrow">→</span>
+        Scale usage
+      </p>
+      <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
+          intuition.</em></p>
+      <p>The early stages — discovery, onboarding, and first build — matter a lot. But for high-intent developers at
+        fast-growing AI startups, they are primarily won by model quality, API quality, and developer (agent?)
+        experience. Platform
+        should keep these flows excellent, but I would not make them the primary growth bet for this team.</p>
+      <p>Where Platform can most directly move revenue is the back half of the journey: moving workloads into production
+        and scaling them. That is where usage and spend compound, and where reliability, observability, evals, and
+        scaling workflows help both teams grow their token usage and Anthropic grow our revenues.</p>
+
+
 
       <h2 class="doc-h2">So what problems do these developers have? And what should we build?</h2>
       <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
