@@ -7,28 +7,6 @@
 
   const STEPS = [
     {
-      target: '#agents-usage-table',
-      title: 'Start with agent usage',
-      body: 'The Agents table now shows 24h cost, 24h tokens, and anomaly counts so you can quickly spot which agent is burning spend.',
-      position: 'bottom',
-      prepare: () => showAgents(),
-    },
-    {
-      target: '[data-tour="agent-anomaly-count"]',
-      title: 'Spot the risky agent',
-      body: 'The anomaly rollup tells you this Coding Assistant has multiple expensive or long-running sessions in the last 24 hours.',
-      position: 'left',
-      prepare: () => showAgents(),
-    },
-    {
-      target: '[data-tour="agent-hot-row"]',
-      title: 'Drill into sessions',
-      body: 'Click Next to open the sessions for this agent and find the specific run that caused the spend.',
-      position: 'bottom',
-      prepare: () => showAgents(),
-      action: () => showSessionsForHotAgent(),
-    },
-    {
       target: '#sessions-usage-table',
       title: 'Find the expensive run',
       body: 'The Sessions table adds cost, tokens, duration, anomaly state, and email status so you can move from agent-level spend to the exact run.',
@@ -63,14 +41,6 @@
       body: 'Email alerts can be enabled separately from detection. When on, the agent creator gets the alert with a one-hour per-agent cooldown.',
       position: 'left',
       prepare: () => showDetectorModal(),
-    },
-    {
-      target: '[data-tour="detector-save"]',
-      title: 'Save preferences',
-      body: 'Saving immediately updates anomaly badges, email status, and trace banners across the page.',
-      position: 'top',
-      prepare: () => showDetectorModal(),
-      action: () => callGlobal('saveDetectorConfig'),
     },
     {
       target: '[data-tour="session-anomaly-row"]',

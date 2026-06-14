@@ -1560,7 +1560,6 @@
         const agent = findAgent(session.agentId);
         const reasons = getReasons(session);
         const anomaly = reasons.length > 0;
-        const email = emailStatus(session);
         const tourRow = session.id === 'sesn_01_xr924f' ? ' data-tour="session-anomaly-row"' : '';
         const tourBadge = session.id === 'sesn_01_xr924f' ? ' data-tour="session-anomaly-badge"' : '';
         return `
@@ -1589,7 +1588,6 @@
                 ${anomaly ? 'Anomaly' : 'None'}
               </span>
             </td>
-            <td><span class="email-badge ${email.className}">${email.label}</span></td>
             <td class="row-actions-cell">
               <button class="dots-btn" onclick="event.stopPropagation()" aria-label="More actions">
                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1615,7 +1613,6 @@
                 <th>Tokens</th>
                 <th>Duration</th>
                 <th>Anomaly</th>
-                <th>Email</th>
                 <th></th>
               </tr>
             </thead>
