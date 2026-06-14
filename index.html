@@ -536,14 +536,24 @@
 
     <div class="tldr-block">
       <div class="tldr-label">TL;DR</div>
-      <p>To grow Claude API revenue, I'd focus the Platform on our hero user: software developers at fast-growing, AI-native startups (Series A–D) — they decide which models to build on, scale spend fastest, and their usage compounds. My intuition tells me new user acquisition is driven by model and product capabilities, so the Platform's lever isn't top-of-funnel demand; it's making "scale your AI workloads on Claude" the safe, reliable, and obvious choice. Our north star is API revenue, and the team is accountable for weekly revenue per active org (plus net revenue retention).</p>
+      <p>To grow Claude API revenue, I'd focus the Platform on our hero user: software developers at fast-growing,
+        AI-native startups (Series A–D) — they decide which models to build on, scale spend fastest, and their usage
+        compounds. My intuition tells me new user acquisition is driven by model and product capabilities, so the
+        Platform's lever isn't top-of-funnel demand; it's making "scale your AI workloads on Claude" the safe, reliable,
+        and obvious choice. Our north star is API revenue, and the team is accountable for weekly revenue per active org
+        (plus net revenue retention).</p>
       <p>Three bets, escalating in scope:</p>
       <ul>
-        <li><strong>Small (2–3 days)</strong> — Problem: rate-limit friction. Solution: when scaling teams hit 429s, give guidance to upgrade their tier via buying more credits.</li>
-        <li><strong>Medium (2 weeks)</strong> — Problem: unpredictable agent costs. Solution: per-agent spend monitoring and anomaly alerts.</li>
-        <li><strong>Big bet (1–2 months)</strong> — Problem: no way to know if an agent change regressed performance. Solution: an Agent Eval Workbench on Managed Agents that compares baseline vs. candidate across production scenarios.</li>
+        <li><strong>Small (2–3 days)</strong> — Problem: rate-limit friction. Solution: when scaling teams hit 429s,
+          give guidance to upgrade their tier via buying more credits.</li>
+        <li><strong>Medium (2 weeks)</strong> — Problem: unpredictable agent costs. Solution: per-agent spend monitoring
+          and anomaly alerts.</li>
+        <li><strong>Big bet (1–2 months)</strong> — Problem: no way to know if an agent change regressed performance.
+          Solution: an Agent Eval Workbench on Managed Agents that compares baseline vs. candidate across production
+          scenarios.</li>
       </ul>
-      <p>I'd ship the small bet first (clearest near-term revenue, lowest effort), then the medium, then the big bet once the production-agent thesis is validated.</p>
+      <p>I'd ship the small bet first (clearest near-term revenue, lowest effort), then the medium, then the big bet
+        once the production-agent thesis is validated.</p>
     </div>
 
     <div class="doc-body">
@@ -623,7 +633,7 @@
           disputes and refunds</li>
       </ul>
 
-      <h2 class="doc-h2">So what problems do these developers have?</h2>
+      <h2 class="doc-h2">So what problems do these developers have? And what should we build?</h2>
       <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
           intuition + customer feedback in public spaces like X</em></p>
 
@@ -664,7 +674,7 @@
             </svg>
           </div>
           <div class="page-link-text">
-            <div class="page-link-title">Console Dashboard</div>
+            <div class="page-link-title">[Demo] Dashboard rate limit upgrade tier</div>
             <div class="page-link-desc">Rate limit upgrade prompts, usage charts, credit balance — the developer home
               screen</div>
           </div>
@@ -719,7 +729,7 @@
             </svg>
           </div>
           <div class="page-link-text">
-            <div class="page-link-title">Managed Agents</div>
+            <div class="page-link-title">[Demo] Managed Agents monitoring</div>
             <div class="page-link-desc">Agent session monitoring, anomaly detection, and per-agent cost breakdowns</div>
           </div>
           <div class="page-link-arrow">
@@ -770,7 +780,7 @@
             </svg>
           </div>
           <div class="page-link-text">
-            <div class="page-link-title">Evaluations</div>
+            <div class="page-link-title">[Demo] Agent Evals</div>
             <div class="page-link-desc">Eval suite management, baseline vs. candidate comparison, run history</div>
           </div>
           <div class="page-link-arrow">
@@ -783,15 +793,26 @@
       </div>
 
       <h2 class="doc-h2">Prioritization</h2>
-      <p>With unlimited resources, we should of course do all of these solutions. However, with limited resources, we must prioritize. I'll propose prioritizing based 3 principles:</p>
+      <p>With unlimited resources, we should of course do all of these solutions. However, with limited resources, we
+        must prioritize. I'll propose prioritizing based 3 principles:</p>
       <ul>
-        <li><strong>Estimated impact to our north star metric:</strong> how directly does this increase Claude API revenue?</li>
+        <li><strong>Estimated impact to our north star metric:</strong> how directly does this increase Claude API
+          revenue?</li>
         <li><strong>Estimated effort to launch an MVP:</strong> how quickly can we ship, learn, and iterate?</li>
-        <li><strong>Strategic differentiation:</strong> does this make Claude Platform meaningfully better for the developers we want to win?</li>
+        <li><strong>Strategic differentiation:</strong> does this make Claude Platform meaningfully better for the
+          developers we want to win?</li>
       </ul>
-      <p>Based on those principles, I would prioritize <strong>Problem #1: rate-limit upgrade guidance</strong> first. It is the least differentiated idea, but it has the clearest near-term revenue path and the lowest engineering effort. Customers hitting 429s are already high-intent users trying to send more traffic to Claude, so helping them understand the limit, recover quickly, and upgrade when eligible should convert an existing scaling pain into incremental usage and revenue.</p>
-      <p>After that, I would prioritize <strong>Problem #2: agent spend guardrails</strong> because it best supports our broader strategy of making Claude safe and reliable for production workloads. It is more differentiated than the rate-limit fix and creates the foundation for the bigger agent platform bet.</p>
-      <p>I would sequence <strong>Problem #3: Agent Eval Workbench</strong> after validating demand through #2. It likely has the largest long-term strategic upside, but it also has the highest execution risk, so I'd want stronger customer signal (through talking to customers) before fully committing.</p>
+      <p>Based on those principles, I would prioritize <strong>Problem #1: rate-limit upgrade guidance</strong> first.
+        It is the least differentiated idea, but it has the clearest near-term revenue path and the lowest engineering
+        effort. Customers hitting 429s are already high-intent users trying to send more traffic to Claude, so helping
+        them understand the limit, recover quickly, and upgrade when eligible should convert an existing scaling pain
+        into incremental usage and revenue.</p>
+      <p>After that, I would prioritize <strong>Problem #2: agent spend guardrails</strong> because it best supports our
+        broader strategy of making Claude safe and reliable for production workloads. It is more differentiated than the
+        rate-limit fix and creates the foundation for the bigger agent platform bet.</p>
+      <p>I would sequence <strong>Problem #3: Agent Eval Workbench</strong> after validating demand through #2. It
+        likely has the largest long-term strategic upside, but it also has the highest execution risk, so I'd want
+        stronger customer signal (through talking to customers) before fully committing.</p>
 
     </div>
   </div>
