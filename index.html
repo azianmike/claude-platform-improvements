@@ -613,23 +613,25 @@
         (model launches, pricing, etc). The primary metric our team will be accountable for is <strong>weekly revenue
           per active org</strong> (active org = org with paid API usage in the last 7 days). This directly captures our
         theory of growth: developers who succeed with the Platform scale their usage.</p>
-      <p>Platform engagement metrics are diagnostics, not goals — a healthy production customer might never log into the
-        console, and that's success, not churn for the Platform. And of course, there are weaknesses to our primary
-        metric, which is why we'll pair it with secondary metrics like number of active paid orgs, churn, and
-        fraud/abuse. With that framing, the metrics we'll track:</p>
+      <p>Platform engagement is not a goal in isolation — a customer repeatedly logging in because they are confused or
+        blocked is not success. But repeated use of high-value workflows like monitoring, guardrails, evals, and model
+        adoption is a strong leading indicator that Claude Platform is becoming the control plane for their AI
+        workloads, which should improve retention and expansion over time. With that framing, the metrics we'll track:
+      </p>
       <ul>
         <li><strong>North star</strong>: weekly API revenue</li>
         <li><strong>Team primary metric:</strong> weekly revenue per active org</li>
         <li><strong>Secondary</strong>:
           <ul>
-            <li><strong>Acquisition / conversion:</strong> new orgs created, teammates invited</li>
+            <li><strong>Acquisition:</strong> new orgs created, teammates invited</li>
             <li><strong>Activation:</strong> time from signup to first API call, time to first production-scale workload
               (e.g., sustained daily token usage), % of active orgs adopting new model/API features within 30 days of
-              launch</li>
-            <li><strong>Engagement:</strong> weekly active orgs in the console, actions taken on Console, docs
-              engagement on new model/API launches, token/API usage growth</li>
+              launch, % of free orgs upgrading to paid</li>
+            <li><strong>Engagement:</strong> weekly active orgs in the console, actions taken on Console, Console weekly
+              retention, docs
+              engagement (esp on new model/API launches), token/API usage growth</li>
             <li><strong>Monetization</strong>: overall API revenue, number of paying orgs, number of active orgs with
-              API traffic, gross margin,</li>
+              API traffic, gross margin</li>
           </ul>
         </li>
         <li><strong>Counter-metrics:</strong> support ticket volume, fraud/abuse, account takeovers, credit card
@@ -753,10 +755,12 @@
         realistic scenarios, compare baseline vs. candidate, and grade whether trajectories regressed before production.
       </p>
       <ul>
-        <li>Customers / market signal: <a href="https://x.com/novasarc01/status/2060403234825785840" target="_blank"
-            rel="noopener">https://x.com/novasarc01/status/2060403234825785840</a>, <a
-            href="https://x.com/i_am_jeganraj/status/2065122606177739001" target="_blank"
-            rel="noopener">https://x.com/i_am_jeganraj/status/2065122606177739001</a></li>
+        <li>Customers / market signal:
+          <ul>
+            <li><a href="https://x.com/novasarc01/status/2060403234825785840" target="_blank" rel="noopener">https://x.com/novasarc01/status/2060403234825785840</a></li>
+            <li><a href="https://x.com/i_am_jeganraj/status/2065122606177739001" target="_blank" rel="noopener">https://x.com/i_am_jeganraj/status/2065122606177739001</a></li>
+          </ul>
+        </li>
       </ul>
       <img src="screenshot-agent-evals.png"
         alt="@novasarc01 on X: increasingly convinced the best agent evals will come from mining real agent failure traces"
