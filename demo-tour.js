@@ -687,6 +687,13 @@
     buildOverlay();
     buildLauncher();
     maybeResume();
+    // Auto-start the full tour from step 1 if no tour is already in progress
+    if (currentIdx < 0) {
+      const page = getCurrentPage();
+      if (page === 'sessions.html' || page === 'managed-agent-evals.html') {
+        start();
+      }
+    }
   }
 
   if (document.readyState === 'loading') {
