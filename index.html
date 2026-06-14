@@ -201,6 +201,64 @@
       font-size: 13px;
     }
 
+    /* ── TL;DR BLOCK ── */
+    .tldr-block {
+      border: 1px solid rgba(212, 121, 58, 0.35);
+      border-radius: 8px;
+      background: rgba(212, 121, 58, 0.07);
+      padding: 24px 28px;
+      margin-bottom: 52px;
+    }
+
+    .tldr-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .tldr-block p {
+      font-size: 14.5px;
+      color: var(--text-sub);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+
+    .tldr-block p:last-child {
+      margin-bottom: 0;
+    }
+
+    .tldr-block ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tldr-block ul li {
+      font-size: 14.5px;
+      color: var(--text-sub);
+      line-height: 1.7;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .tldr-block ul li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .tldr-block strong {
+      font-weight: 600;
+      color: var(--text);
+    }
+
     .doc-body p {
       font-size: 15.5px;
       color: var(--text-sub);
@@ -474,6 +532,18 @@
           or retention).
         </p>
       </div>
+    </div>
+
+    <div class="tldr-block">
+      <div class="tldr-label">TL;DR</div>
+      <p>To grow Claude API revenue, I'd focus the Platform on our hero user: software developers at fast-growing, AI-native startups (Series A–D) — they decide which models to build on, scale spend fastest, and their usage compounds. My intuition tells me new user acquisition is driven by model and product capabilities, so the Platform's lever isn't top-of-funnel demand; it's making "scale your AI workloads on Claude" the safe, reliable, and obvious choice. Our north star is API revenue, and the team is accountable for weekly revenue per active org (plus net revenue retention).</p>
+      <p>Three bets, escalating in scope:</p>
+      <ul>
+        <li><strong>Small (2–3 days)</strong> — Problem: rate-limit friction. Solution: when scaling teams hit 429s, give guidance to upgrade their tier via buying more credits.</li>
+        <li><strong>Medium (2 weeks)</strong> — Problem: unpredictable agent costs. Solution: per-agent spend monitoring and anomaly alerts.</li>
+        <li><strong>Big bet (1–2 months)</strong> — Problem: no way to know if an agent change regressed performance. Solution: an Agent Eval Workbench on Managed Agents that compares baseline vs. candidate across production scenarios.</li>
+      </ul>
+      <p>I'd ship the small bet first (clearest near-term revenue, lowest effort), then the medium, then the big bet once the production-agent thesis is validated.</p>
     </div>
 
     <div class="doc-body">
