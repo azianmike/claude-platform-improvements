@@ -658,7 +658,12 @@
       <ul>
         <li>Solution (small, 2-3 eng days): When an org hits 429s on a model,
           show a message like: "You're rate-limited on Sonnet. You can unlock higher rate limits by adding credits to
-          upgrade your tier." Then add an easy to click button to purchase more credits to upgrade tier.</li>
+          upgrade your tier." Then add an easy to click button to purchase more credits to upgrade tier.
+          <ul>
+            <li><em>Before widely shipping, we will run an A/B test to measure uplift in tier upgrades and credits
+                purchased vs. a control group.</em></li>
+          </ul>
+        </li>
         <li>Hypothesis: Helping fast scaling startups upgrade for more rate limits both unblocks these startups to
           continue serving customers and increases revenue on Claude instead of pushing customers to competitors.</li>
         <li>Success metrics: Increase weekly # of customers upgrading tiers, increase total credits purchased per user,
