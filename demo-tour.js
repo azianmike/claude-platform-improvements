@@ -26,27 +26,8 @@
       page: 'sessions.html',
       target: '#row-pop-0 .popover-item.highlight',
       title: 'Add to eval suite',
-      body: 'This is the heart of the workflow: turn a real session into a reusable scenario. Captures the input, tool trace, final output, cost, and latency.',
+      body: 'This is the heart of the workflow: turn a real session into a reusable scenario. Captures the input, tool trace, final output, cost, and latency. Click Next to jump to the suite.',
       position: 'left',
-      action: () => document.querySelector('#row-pop-0 .popover-item.highlight').click(),
-    },
-    {
-      page: 'sessions.html',
-      target: '#add-suite',
-      title: 'Pick the eval suite',
-      body: 'Add this scenario to the "Coding Agent Regression Suite" — the collection of tests you\'ll run every time you change the Coding Assistant.',
-      position: 'top',
-    },
-    {
-      page: 'sessions.html',
-      target: '#add-modal .btn-primary',
-      title: 'Confirm the scenario',
-      body: 'In a real session, this saves the scenario into the suite. The suite already has 17 other scenarios — let\'s see them.',
-      position: 'top',
-      action: () => {
-        const m = document.getElementById('add-modal');
-        if (m) m.classList.remove('open');
-      },
       nextPage: 'managed-agent-evals.html',
     },
     {
@@ -661,12 +642,13 @@
   // ───────────────────────────── RESUME ─────────────────────────────
   function maybeResume() {
     const state = loadState();
-    if (!state.active || typeof state.idx !== 'number') return;
-    if (state.idx < 0 || state.idx >= STEPS.length) return;
+    if (!state.active || typeof state.idx !== 'number') return false;
+    if (state.idx < 0 || state.idx >= STEPS.length) return false;
     const step = STEPS[state.idx];
-    if (step.page !== getCurrentPage()) return;
+    if (step.page !== getCurrentPage()) return false;
     // Wait for any page-level rendering to finish, then show
     setTimeout(() => showStep(state.idx), 250);
+    return true;
   }
 
   // ───────────────────────────── RESIZE ─────────────────────────────
@@ -686,7 +668,10 @@
     injectStyles();
     buildOverlay();
     buildLauncher();
-    maybeResume();
+    // maybeResume() schedules showStep() asynchronously, so we can't rely on
+    // currentIdx being set when we check it below. Use its return value to
+    // decide whether to auto-start a fresh tour.
+    if (maybeResume()) return;
     // Auto-start the full tour from step 1 if no tour is already in progress
     if (currentIdx < 0) {
       const page = getCurrentPage();
