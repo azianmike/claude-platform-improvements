@@ -672,12 +672,12 @@
       <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
           intuition.</em></p>
       <p>The early stages — discovery, onboarding, and first build — matter a lot. But for high-intent developers at
-        fast-growing AI startups, they are primarily won by model quality, API quality, and developer (agent?)
+        fast-growing AI startups, they are primarily won by model quality, API quality, and developer (coding agent?)
         experience. Platform
         should keep these flows excellent, but I would not make them the primary growth bet for this team.</p>
       <p>Where Platform can most directly move revenue is the back half of the journey: moving workloads into production
         and scaling them. That is where usage and spend compound, and where reliability, observability, evals, and
-        scaling workflows help both teams grow their token usage and Anthropic grow our revenues.</p>
+        scaling workflows help teams grow their token usage and Anthropic grow our revenues.</p>
 
 
 
@@ -685,8 +685,10 @@
       <p class="doc-disclaimer"><em>Disclaimer: I'd obviously talk to customers. But in lieu of that, I'll use my
           intuition + customer feedback from public spaces like X</em></p>
 
-      <p class="problem-head"><strong>Problem #1:</strong> As AI-native startups scale quickly, Claude usage can spike
-        quickly and teams may hit rate limits on their primary model, causing 429s.</p>
+      <p class="problem-head"><strong>Problem #1:</strong> As AI-native startups scale exponentially, Claude API usage
+        can
+        spike
+        quickly and teams may hit rate limits, causing 429s.</p>
       <ul>
         <li>Customers complaining:
           <ul>
@@ -709,12 +711,14 @@
         </li>
         <li>Hypothesis: Helping fast scaling startups upgrade for more rate limits both unblocks these startups to
           continue serving customers and increases revenue on Claude instead of pushing customers to competitors.</li>
-        <li>Success metrics: Increase weekly # of customers upgrading tiers, increase total credits purchased per user,
-          increase tokens processed per user, increase total revenue per user, reduction in repeated 429s, reduced
-          support tickets about rate limits</li>
+        <li>Success metrics: Decrease number of repeatedly rate limit customers, reduction in repeated 429s, reduced
+          support tickets about rate limits,increase weekly # of customers
+          upgrading
+          tiers, increase total credits purchased per user,
+          increase tokens processed per user, increase total revenue per user.</li>
         <li>Risks: If a customer is in an outage and Claude says "pay us more," it can feel extractive. If they are
           already Tier 4 or need custom limits, the right CTA may be "Contact sales / request custom limits," not "buy
-          credits."</li>
+          credits to upgrade tiers."</li>
       </ul>
       <div class="doc-page-link">
         <a href="rate-limits.html" class="page-link">
@@ -796,11 +800,13 @@
           moving more
           agent workloads into production on Managed Agents instead of limiting rollout or routing work elsewhere.
           Additionally, this will increase adoption of our Managed Agent product instead of users building their own
-          agents.</li>
-        <li>Success metrics: Increase Managed Agent usage, increase token spend from
-          monitored agents, reduce support tickets, and reduce churn risk.</li>
-        <li>Risks: It could reduce revenue. Mitigate via the counter-metric above; default caps to generous/off; frame
-          UI around anomaly protection, not budgeting down.</li>
+          agents because of the "out of the box" infrastructure we provide.</li>
+        <li>Success metrics: Increase Managed Agent usage, increase retention of
+          Managed Agents, reduce support tickets, and reduce churn risk.</li>
+        <li>Risks: It could reduce revenue by helping customers identify expensive/long running agents and turn them
+          off. However, I would argue that these users would've churned because of lack of cost/usage observability
+          without
+          this feature.</li>
       </ul>
       <div class="doc-page-link">
         <a href="managed-agent-usage.html#sessions" class="page-link">
