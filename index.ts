@@ -1,5 +1,15 @@
 import "dotenv/config";
 import Anthropic from "@anthropic-ai/sdk";
+import { PostHog } from "posthog-node";
+
+const posthog = new PostHog(process.env.POSTHOG_API_KEY!, {
+  host: process.env.POSTHOG_HOST,
+  flushAt: 1,
+  flushInterval: 0,
+  enableExceptionAutocapture: true,
+});
+
+const distinctId = process.env.USER || process.env.USERNAME || "unknown_user";
 
 async function main() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -8,6 +18,13 @@ async function main() {
     console.error("Please configure it in your .env file or export it in your environment.");
     process.exit(1);
   }
+
+  posthog.identify({
+    distinctId,
+    properties: {
+      $set: { username: distinctId },
+    },
+  });
 
   // Initialize the Anthropic client (will automatically use ANTHROPIC_API_KEY)
   const client = new Anthropic({
@@ -24,6 +41,16 @@ async function main() {
     ],
   });
   console.log(`✓ Agent created! ID: ${agent.id}, version: ${agent.version}`);
+  posthog.capture({
+    distinctId,
+    event: "agent created",
+    properties: {
+      agent_id: agent.id,
+      agent_name: agent.name,
+      agent_model: agent.model,
+      agent_version: agent.version,
+    },
+  });
 
   console.log("\n2. Creating environment...");
   const environment = await client.beta.environments.create({
@@ -34,6 +61,15 @@ async function main() {
     },
   });
   console.log(`✓ Environment created! ID: ${environment.id}`);
+  posthog.capture({
+    distinctId,
+    event: "environment created",
+    properties: {
+      environment_id: environment.id,
+      environment_name: environment.name,
+      environment_type: "cloud",
+    },
+  });
 
   console.log("\n3. Starting session...");
   const session = await client.beta.sessions.create({
@@ -42,6 +78,15 @@ async function main() {
     title: "Quickstart session",
   });
   console.log(`✓ Session started! ID: ${session.id}`);
+  posthog.capture({
+    distinctId,
+    event: "session started",
+    properties: {
+      session_id: session.id,
+      agent_id: agent.id,
+      environment_id: environment.id,
+    },
+  });
 
   console.log("\n4. Opening event stream and sending initial message...");
   const stream = await client.beta.sessions.events.stream(session.id);
@@ -60,6 +105,14 @@ async function main() {
       },
     ],
   });
+  posthog.capture({
+    distinctId,
+    event: "message sent",
+    properties: {
+      session_id: session.id,
+      agent_id: agent.id,
+    },
+  });
 
   console.log("\n--- Streaming Response ---");
   // Process streaming events
@@ -72,14 +125,35 @@ async function main() {
       }
     } else if (event.type === "agent.tool_use") {
       console.log(`\n[Using tool: ${event.name}]`);
+      posthog.capture({
+        distinctId,
+        event: "agent tool used",
+        properties: {
+          session_id: session.id,
+          agent_id: agent.id,
+          tool_name: event.name,
+        },
+      });
     } else if (event.type === "session.status_idle") {
       console.log("\n\nAgent finished.");
+      posthog.capture({
+        distinctId,
+        event: "session completed",
+        properties: {
+          session_id: session.id,
+          agent_id: agent.id,
+        },
+      });
       break;
     }
   }
 }
 
-main().catch((err) => {
-  console.error("\n❌ Unhandled error during execution:", err);
-  process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error("\n❌ Unhandled error during execution:", err);
+    posthog.captureException(err, distinctId);
+  })
+  .finally(async () => {
+    await posthog.shutdown();
+  });

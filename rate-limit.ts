@@ -1,6 +1,18 @@
 // hit-haiku-rpm.ts
 // Run: ANTHROPIC_API_KEY=sk-ant-... npx tsx hit-haiku-rpm.ts
 
+import "dotenv/config";
+import { PostHog } from "posthog-node";
+
+const posthog = new PostHog(process.env.POSTHOG_API_KEY!, {
+    host: process.env.POSTHOG_HOST,
+    flushAt: 1,
+    flushInterval: 0,
+    enableExceptionAutocapture: true,
+});
+
+const distinctId = process.env.USER || process.env.USERNAME || "unknown_user";
+
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) process.exit(1);
 
@@ -46,25 +58,36 @@ async function sendOne(requestNumber: number) {
 
             const body = await res.text().catch(() => "");
 
-            console.log(
-                JSON.stringify(
-                    {
-                        event: "RATE_LIMIT_HIT",
-                        status: res.status,
-                        retry_after: res.headers.get("retry-after"),
-                        requests_started: requestNumber,
-                        elapsed_ms: Date.now() - t0,
-                        request_limit: res.headers.get("anthropic-ratelimit-requests-limit"),
-                        request_remaining: res.headers.get("anthropic-ratelimit-requests-remaining"),
-                        request_reset: res.headers.get("anthropic-ratelimit-requests-reset"),
-                        input_token_limit: res.headers.get("anthropic-ratelimit-input-tokens-limit"),
-                        output_token_limit: res.headers.get("anthropic-ratelimit-output-tokens-limit"),
-                        body,
-                    },
-                    null,
-                    2
-                )
-            );
+            const rateLimitData = {
+                event: "RATE_LIMIT_HIT",
+                status: res.status,
+                retry_after: res.headers.get("retry-after"),
+                requests_started: requestNumber,
+                elapsed_ms: Date.now() - t0,
+                request_limit: res.headers.get("anthropic-ratelimit-requests-limit"),
+                request_remaining: res.headers.get("anthropic-ratelimit-requests-remaining"),
+                request_reset: res.headers.get("anthropic-ratelimit-requests-reset"),
+                input_token_limit: res.headers.get("anthropic-ratelimit-input-tokens-limit"),
+                output_token_limit: res.headers.get("anthropic-ratelimit-output-tokens-limit"),
+                body,
+            };
+
+            console.log(JSON.stringify(rateLimitData, null, 2));
+
+            posthog.capture({
+                distinctId,
+                event: "rate limit hit",
+                properties: {
+                    model: MODEL,
+                    requests_started: requestNumber,
+                    elapsed_ms: Date.now() - t0,
+                    retry_after: res.headers.get("retry-after"),
+                    request_limit: res.headers.get("anthropic-ratelimit-requests-limit"),
+                    request_remaining: res.headers.get("anthropic-ratelimit-requests-remaining"),
+                    input_token_limit: res.headers.get("anthropic-ratelimit-input-tokens-limit"),
+                    output_token_limit: res.headers.get("anthropic-ratelimit-output-tokens-limit"),
+                },
+            });
 
             controller.abort();
         }
@@ -98,4 +121,8 @@ async function main() {
     if (!hitRateLimit) process.exitCode = 2;
 }
 
-main().catch(() => process.exit(1));
+main()
+    .catch(() => process.exit(1))
+    .finally(async () => {
+        await posthog.shutdown();
+    });
