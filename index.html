@@ -833,7 +833,7 @@
       <p class="problem-head"><strong>Problem #3 (big bet):</strong> Teams building long-horizon agents can't
         confidently answer "did this prompt, tool, or model change make my agent better or worse?" Managed Agents lets
         them execute and trace individual sessions, but there's no higher-level workflow to run a change across many
-        realistic scenarios, compare baseline vs. candidate, and grade whether trajectories regressed before production.
+        realistic scenarios, compare baseline vs. candidate, and determine whether an Agent regressed before production.
       </p>
       <ul>
         <li>Customers / market signal:
@@ -851,8 +851,8 @@
       <ul>
         <li>Solution (big bet, 1–2 months eng): Claude Agent Eval Workbench, built on Managed Agents. Teams define eval
           suites, pick a baseline and candidate agent version, run both across the same scenarios, and compare final
-          outputs, tool calls, event traces, success rate, latency, and token/session cost. Grading combines
-          deterministic checks and a human review queue to flag regressions.</li>
+          outputs, tool calls, event traces, success rate, latency, and token/session cost. A human can then easily
+          review to flag regressions.</li>
         <li>Hypothesis: If developers can reliably evaluate long-horizon agent changes before production, they will
           iterate faster, adopt new Claude models sooner, and scale more agent workloads on Claude with confidence.</li>
         <li>Success metrics: Increase eval runs per active org, increase new model adoption among agent-building orgs,
@@ -886,7 +886,7 @@
 
       <h2 class="doc-h2">Prioritization</h2>
       <p>With unlimited resources, we should of course do all of these solutions. However, with limited resources, we
-        must prioritize. I'll propose prioritizing based 3 principles:</p>
+        must prioritize. I'll propose prioritizing based on 3 principles:</p>
       <ul>
         <li><strong>Estimated impact to our north star metric:</strong> how directly does this increase Claude API
           revenue?</li>
